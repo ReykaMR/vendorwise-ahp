@@ -1,0 +1,195 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ------------------------------------------------------------
+// Model: User
+// Pengguna/pengambil keputusan yang melakukan penilaian AHP
+// ------------------------------------------------------------
+model User {
+  id            String               @id @default(cuid())
+  name          String
+  email         String               @unique
+  password      String               // Hashed password (jangan disimpan plaintext)
+  role          Role                 @default(USER)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  // Relasi
+  criteriaComparisons   CriteriaComparison[]
+  supplierComparisons   SupplierComparison[]
+  criteriaPriorities    CriteriaPriority[]
+  supplierPriorities    SupplierPriority[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+// ------------------------------------------------------------
+// Model: Criteria
+// Kriteria dan subkriteria dalam hierarki AHP (self-referential)
+// ------------------------------------------------------------
+model Criteria {
+  id          String    @id @default(cuid())
+  name        String
+  description String?   @db.Text
+  level       Int       @default(0) // 0 = kriteria utama, 1 = subkriteria, dst.
+  parentId    String?   @map("parent_id")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relasi hierarki
+  parent      Criteria?  @relation("CriteriaHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Criteria[] @relation("CriteriaHierarchy")
+
+  // Relasi perbandingan
+  criteriaComparisons1 CriteriaComparison[] @relation("Criteria1")
+  criteriaComparisons2 CriteriaComparison[] @relation("Criteria2")
+  criteriaPriorities   CriteriaPriority[]
+  supplierComparisons  SupplierComparison[]
+  supplierPriorities   SupplierPriority[]
+
+  @@unique([name, parentId]) // Nama unik dalam satu level/induk
+  @@index([parentId])
+  @@map("criteria")
+}
+
+// ------------------------------------------------------------
+// Model: Supplier
+// Alternatif pemasok bahan baku
+// ------------------------------------------------------------
+model Supplier {
+  id             String   @id @default(cuid())
+  name           String
+  address        String?  @db.Text
+  contactPerson  String?  @map("contact_person")
+  phone          String?
+  email          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relasi perbandingan dan prioritas
+  supplierComparisons1 SupplierComparison[] @relation("Supplier1")
+  supplierComparisons2 SupplierComparison[] @relation("Supplier2")
+  supplierPriorities   SupplierPriority[]
+
+  @@map("suppliers")
+}
+
+// ------------------------------------------------------------
+// Model: CriteriaComparison
+// Perbandingan berpasangan antar kriteria (Saaty scale 1-9)
+// Hanya menyimpan satu arah (criteria1Id < criteria2Id) untuk menghindari duplikasi
+// ------------------------------------------------------------
+model CriteriaComparison {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  criteria1Id  String   @map("criteria1_id")
+  criteria2Id  String   @map("criteria2_id")
+  value        Float    // Skala 1/9 hingga 9, disimpan sebagai desimal
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relasi
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  criteria1  Criteria @relation("Criteria1", fields: [criteria1Id], references: [id], onDelete: Cascade)
+  criteria2  Criteria @relation("Criteria2", fields: [criteria2Id], references: [id], onDelete: Cascade)
+
+  // Constraint: hanya satu perbandingan per pasangan kriteria per user
+  @@unique([userId, criteria1Id, criteria2Id])
+  @@index([userId])
+  @@index([criteria1Id, criteria2Id])
+  @@map("criteria_comparisons")
+}
+
+// ------------------------------------------------------------
+// Model: SupplierComparison
+// Perbandingan berpasangan antar pemasok untuk setiap kriteria
+// Hanya menyimpan satu arah (supplier1Id < supplier2Id)
+// ------------------------------------------------------------
+model SupplierComparison {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  criteriaId   String   @map("criteria_id")
+  supplier1Id  String   @map("supplier1_id")
+  supplier2Id  String   @map("supplier2_id")
+  value        Float    // Skala 1/9 hingga 9
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relasi
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  criteria   Criteria @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
+  supplier1  Supplier @relation("Supplier1", fields: [supplier1Id], references: [id], onDelete: Cascade)
+  supplier2  Supplier @relation("Supplier2", fields: [supplier2Id], references: [id], onDelete: Cascade)
+
+  // Constraint: satu perbandingan per pasangan supplier dalam kriteria tertentu per user
+  @@unique([userId, criteriaId, supplier1Id, supplier2Id])
+  @@index([userId])
+  @@index([criteriaId])
+  @@map("supplier_comparisons")
+}
+
+// ------------------------------------------------------------
+// Model: CriteriaPriority
+// Bobot prioritas hasil perhitungan AHP untuk setiap kriteria per user
+// Menyimpan nilai eigenvector dan Consistency Ratio (CR)
+// ------------------------------------------------------------
+model CriteriaPriority {
+  id               String   @id @default(cuid())
+  userId           String   @map("user_id")
+  criteriaId       String   @map("criteria_id")
+  priority         Float    // Bobot prioritas (eigenvector)
+  consistencyRatio Float?   @map("consistency_ratio") // CR hasil perhitungan (opsional)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relasi
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  criteria Criteria @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
+
+  // Satu bobot per kriteria per user
+  @@unique([userId, criteriaId])
+  @@index([userId])
+  @@map("criteria_priorities")
+}
+
+// ------------------------------------------------------------
+// Model: SupplierPriority
+// Bobot prioritas pemasok untuk setiap kriteria per user
+// Digunakan untuk menghitung total skor akhir alternatif
+// ------------------------------------------------------------
+model SupplierPriority {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  criteriaId  String   @map("criteria_id")
+  supplierId  String   @map("supplier_id")
+  priority    Float    // Bobot prioritas pemasok pada kriteria tertentu
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relasi
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  criteria Criteria @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  // Satu bobot per supplier per kriteria per user
+  @@unique([userId, criteriaId, supplierId])
+  @@index([userId])
+  @@index([criteriaId])
+  @@map("supplier_priorities")
+}
