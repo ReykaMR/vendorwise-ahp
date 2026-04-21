@@ -35,6 +35,7 @@ import {
   EyeOff,
   CheckCircle2,
 } from "lucide-react";
+import Link from "next/link";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -212,7 +213,7 @@ export function RegisterForm() {
 
           <Button
             type="submit"
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium transition-colors py-4"
             disabled={isPending}
           >
             {isPending ? (
@@ -228,12 +229,12 @@ export function RegisterForm() {
 
         <p className="mt-6 text-center text-sm text-teal-700">
           Sudah punya akun?{" "}
-          <a
+          <Link
             href="/login"
             className="font-medium text-teal-600 hover:text-teal-800 underline decoration-teal-300 underline-offset-2"
           >
             Masuk
-          </a>
+          </Link>
         </p>
       </CardContent>
     </Card>
