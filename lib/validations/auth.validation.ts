@@ -13,3 +13,10 @@ export const registerSchema = z
   });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+export const loginSchema = z.object({
+  email: z.string().email("Format email tidak valid"),
+  password: z.string().min(1, "Password harus diisi"),
+});
+
+export type LoginInput = z.infer<typeof loginSchema>;
