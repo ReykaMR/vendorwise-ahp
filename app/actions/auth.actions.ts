@@ -20,7 +20,6 @@ export async function registerUser(
   prevState: RegisterState | null,
   formData: FormData,
 ): Promise<RegisterState> {
-  // Validasi dengan Zod
   const validated = registerSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
