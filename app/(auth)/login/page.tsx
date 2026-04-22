@@ -7,7 +7,6 @@ import { Suspense } from "react";
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
 
-  // Jika sudah login, redirect ke dashboard
   if (session?.user) {
     redirect("/dashboard");
   }
