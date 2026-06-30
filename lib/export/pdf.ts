@@ -2,8 +2,19 @@ import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
 import type { AHPResult } from "@/services/ahp.service";
 
+interface JsPDFWithAutoTable extends jsPDF {
+  lastAutoTable?: { finalY: number };
+  getNumberOfPages: () => number;
+}
+
+function getFinalY(doc: JsPDFWithAutoTable): number {
+  const finalY = doc.lastAutoTable?.finalY;
+  if (finalY === undefined) throw new Error("Gagal membuat tabel PDF");
+  return finalY;
+}
+
 export function exportPDF(result: AHPResult): void {
-  const doc = new jsPDF();
+  const doc = new jsPDF() as JsPDFWithAutoTable;
   const pageWidth = doc.internal.pageSize.getWidth();
 
   // -- Title --
@@ -14,11 +25,7 @@ export function exportPDF(result: AHPResult): void {
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
   doc.text(`Tanggal: ${new Date().toLocaleDateString("id-ID")}`, 14, 30);
-  doc.text(
-    "Aplikasi: VendorWise AHP — SPK Pemilihan Pemasok",
-    14,
-    36,
-  );
+  doc.text("Aplikasi: VendorWise AHP — SPK Pemilihan Pemasok", 14, 36);
 
   let y = 44;
 
@@ -47,8 +54,7 @@ export function exportPDF(result: AHPResult): void {
       },
       styles: { fontSize: 10 },
     });
-    y = (doc as unknown as { lastAutoTable: { finalY: number } })
-        .lastAutoTable.finalY + 8;
+    y = getFinalY(doc) + 8;
 
     const cons = result.criteriaResult.consistency;
     doc.setFontSize(10);
@@ -101,8 +107,7 @@ export function exportPDF(result: AHPResult): void {
         },
         styles: { fontSize: 10 },
       });
-      y = (doc as unknown as { lastAutoTable: { finalY: number } })
-          .lastAutoTable.finalY + 10;
+      y = getFinalY(doc) + 10;
     }
   }
 
@@ -120,14 +125,13 @@ export function exportPDF(result: AHPResult): void {
     doc.text("Peringkat Akhir Pemasok", 14, y);
     y += 8;
 
-    const scoreColumns = result.ranking[0]?.scores.map((s) => s.criteriaName) || [];
+    const scoreColumns =
+      result.ranking[0]?.scores.map((s) => s.criteriaName) || [];
     const rankBody = result.ranking.map((r, i) => [
       String(i + 1),
       r.supplierName,
       `${(r.totalScore * 100).toFixed(2)}%`,
-      ...r.scores.map(
-        (s) => `${(s.score * 100).toFixed(2)}%`,
-      ),
+      ...r.scores.map((s) => `${(s.score * 100).toFixed(2)}%`),
     ]);
 
     autoTable(doc, {
@@ -142,12 +146,11 @@ export function exportPDF(result: AHPResult): void {
       },
       styles: { fontSize: 9 },
     });
-    y = (doc as unknown as { lastAutoTable: { finalY: number } })
-        .lastAutoTable.finalY + 10;
+    y = getFinalY(doc) + 10;
   }
 
   // -- Footer --
-  const pageCount = (doc.internal as unknown as { getNumberOfPages: () => number }).getNumberOfPages();
+  const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);

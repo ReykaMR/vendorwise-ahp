@@ -2,14 +2,13 @@ import { criteriaRepository } from "@/repositories/criteria.repository";
 import { supplierRepository } from "@/repositories/supplier.repository";
 import { comparisonRepository } from "@/repositories/comparison.repository";
 import { priorityRepository } from "@/repositories/priority.repository";
-import { Prisma } from "@/app/generated/prisma/client";
+import { historyRepository } from "@/repositories/history.repository";
 import { calculatePriorities } from "@/lib/ahp/priority";
-import { calculateFinalScores, type SupplierScore } from "@/lib/ahp/final-score";
+import {
+  calculateFinalScores,
+  type SupplierScore,
+} from "@/lib/ahp/final-score";
 import type { ComparisonInput } from "@/lib/ahp/matrix";
-
-type CriteriaPriorityWithCriteria = Prisma.CriteriaPriorityGetPayload<{
-  include: { criteria: { select: { id: true; name: true } } };
-}>;
 
 export type AHPResult = {
   success: boolean;
@@ -55,9 +54,8 @@ export const ahpService = {
       };
     }
 
-    const criteriaComparisons = await comparisonRepository.findCriteriaByUser(
-      userId,
-    );
+    const criteriaComparisons =
+      await comparisonRepository.findCriteriaByUser(userId);
     if (criteriaComparisons.length === 0) {
       return {
         success: false,
@@ -182,6 +180,7 @@ export const ahpService = {
             criteria.id,
             item.id,
             item.priority,
+            supplierPriority.consistency.cr,
           );
         }
 
@@ -244,19 +243,26 @@ export const ahpService = {
       }
     }
 
-    const ranking = calculateFinalScores(criteriaWeights, allSupplierPriorities);
+    const ranking = calculateFinalScores(
+      criteriaWeights,
+      allSupplierPriorities,
+    );
 
-    return {
+    const result: AHPResult = {
       success: true,
       criteriaResult,
       supplierResults,
       ranking,
       warnings,
     };
+
+    await historyRepository.create(userId, result as Record<string, unknown>);
+
+    return result;
   },
 
   async getLastResults(userId: string): Promise<AHPResult> {
-    const criteriaPriorities = await priorityRepository.findByUser(userId) as CriteriaPriorityWithCriteria[];
+    const criteriaPriorities = await priorityRepository.findByUser(userId);
 
     if (criteriaPriorities.length === 0) {
       return {
@@ -264,12 +270,13 @@ export const ahpService = {
         criteriaResult: null,
         supplierResults: [],
         ranking: [],
-        warnings: ["Belum ada perhitungan AHP. Klik 'Hitung AHP' untuk memulai."],
+        warnings: [
+          "Belum ada perhitungan AHP. Klik 'Hitung AHP' untuk memulai.",
+        ],
       };
     }
 
-    const consistencyRatio =
-      criteriaPriorities[0].consistencyRatio ?? null;
+    const consistencyRatio = criteriaPriorities[0].consistencyRatio ?? null;
     const allCrValues = criteriaPriorities
       .map((cp) => cp.consistencyRatio)
       .filter((cr): cr is number => cr !== null);
@@ -298,14 +305,18 @@ export const ahpService = {
 
     const groupedSuppliers = new Map<
       string,
-      { criteriaName: string; items: { id: string; name: string; priority: number }[]; crs: number[] }
+      {
+        criteriaName: string;
+        items: { id: string; name: string; priority: number }[];
+        crValues: number[];
+      }
     >();
     for (const sp of supplierData) {
       if (!groupedSuppliers.has(sp.criteriaId)) {
         groupedSuppliers.set(sp.criteriaId, {
           criteriaName: sp.criteria.name,
           items: [],
-          crs: [],
+          crValues: [],
         });
       }
       const group = groupedSuppliers.get(sp.criteriaId)!;
@@ -316,11 +327,18 @@ export const ahpService = {
           priority: sp.priority,
         });
       }
+      if (sp.consistencyRatio !== null && sp.consistencyRatio !== undefined) {
+        group.crValues.push(sp.consistencyRatio);
+      }
     }
 
     const supplierResults: AHPResult["supplierResults"] = [];
     for (const [criteriaId, group] of groupedSuppliers) {
       group.items.sort((a, b) => b.priority - a.priority);
+      const avgCr =
+        group.crValues.length > 0
+          ? group.crValues.reduce((a, b) => a + b, 0) / group.crValues.length
+          : 0;
       supplierResults.push({
         criteriaId,
         criteriaName: group.criteriaName,
@@ -329,8 +347,8 @@ export const ahpService = {
           lambdaMax: 0,
           ci: 0,
           ri: 0,
-          cr: 0,
-          isConsistent: true,
+          cr: avgCr,
+          isConsistent: avgCr < 0.1,
         },
       });
     }
@@ -361,7 +379,10 @@ export const ahpService = {
       }
     }
 
-    const ranking = calculateFinalScores(criteriaWeights, allSupplierPriorities);
+    const ranking = calculateFinalScores(
+      criteriaWeights,
+      allSupplierPriorities,
+    );
 
     const warnings: string[] = [];
     if (!criteriaResult.consistency.isConsistent) {

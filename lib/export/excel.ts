@@ -15,26 +15,18 @@ export function exportExcel(result: AHPResult): void {
     critData.push({
       No: 0,
       Kriteria: "CR",
-      Bobot: Number(
-        (result.criteriaResult.consistency.cr * 100).toFixed(4),
-      ),
+      Bobot: Number((result.criteriaResult.consistency.cr * 100).toFixed(4)),
     });
     critData.push({
       No: 0,
       Kriteria: "Status",
-      Bobot: result.criteriaResult.consistency.isConsistent
-        ? 1
-        : 0,
+      Bobot: result.criteriaResult.consistency.isConsistent ? 1 : 0,
     });
 
     const critSheet = XLSX.utils.json_to_sheet(critData);
 
     // Set column widths
-    critSheet["!cols"] = [
-      { wch: 5 },
-      { wch: 25 },
-      { wch: 10 },
-    ];
+    critSheet["!cols"] = [{ wch: 5 }, { wch: 25 }, { wch: 10 }];
 
     XLSX.utils.book_append_sheet(wb, critSheet, "Bobot Kriteria");
   }
@@ -58,11 +50,7 @@ export function exportExcel(result: AHPResult): void {
     }
 
     const suppSheet = XLSX.utils.json_to_sheet(suppRows);
-    suppSheet["!cols"] = [
-      { wch: 25 },
-      { wch: 25 },
-      { wch: 10 },
-    ];
+    suppSheet["!cols"] = [{ wch: 25 }, { wch: 25 }, { wch: 10 }];
     XLSX.utils.book_append_sheet(wb, suppSheet, "Bobot Pemasok");
   }
 
@@ -83,11 +71,7 @@ export function exportExcel(result: AHPResult): void {
     });
 
     const rankSheet = XLSX.utils.json_to_sheet(rankData);
-    rankSheet["!cols"] = [
-      { wch: 10 },
-      { wch: 25 },
-      { wch: 15 },
-    ];
+    rankSheet["!cols"] = [{ wch: 10 }, { wch: 25 }, { wch: 15 }];
 
     const extraCols = result.ranking[0]?.scores.length || 0;
     for (let i = 0; i < extraCols; i++) {

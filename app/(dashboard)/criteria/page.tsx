@@ -6,6 +6,12 @@ import { CriteriaTree } from "@/components/criteria/CriteriaTree";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Daftar Kriteria — VendorWise AHP",
+  description: "Kelola kriteria penilaian pemasok menggunakan metode AHP.",
+};
 
 export default async function CriteriaPage() {
   const session = await getServerSession(authOptions);

@@ -6,7 +6,7 @@ import { SupplierForm } from "@/components/suppliers/SupplierForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type EditSupplierPageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function EditSupplierPage({
@@ -15,7 +15,8 @@ export default async function EditSupplierPage({
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login");
 
-  const supplier = await supplierService.getById(params.id);
+  const { id } = await params;
+  const supplier = await supplierService.getById(id);
   if (!supplier) notFound();
 
   return (

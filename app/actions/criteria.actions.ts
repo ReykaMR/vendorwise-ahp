@@ -14,6 +14,12 @@ async function requireAuth() {
   return session.user;
 }
 
+async function requireAdmin() {
+  const user = await requireAuth();
+  if (user.role !== "ADMIN") throw new Error("Akses ditolak");
+  return user;
+}
+
 export type CreateCriteriaState = {
   success?: boolean;
   errors?: {
@@ -29,7 +35,7 @@ export async function createCriteria(
   formData: FormData,
 ): Promise<CreateCriteriaState> {
   try {
-    await requireAuth();
+    await requireAdmin();
   } catch (err: unknown) {
     return {
       errors: { _form: [err instanceof Error ? err.message : "Akses ditolak"] },
@@ -74,7 +80,7 @@ export async function updateCriteria(
   formData: FormData,
 ): Promise<UpdateCriteriaState> {
   try {
-    await requireAuth();
+    await requireAdmin();
   } catch (err: unknown) {
     return {
       errors: { _form: [err instanceof Error ? err.message : "Akses ditolak"] },
@@ -112,7 +118,7 @@ export async function deleteCriteria(
   criteriaId: string,
 ): Promise<DeleteCriteriaState> {
   try {
-    await requireAuth();
+    await requireAdmin();
   } catch (err: unknown) {
     return { error: err instanceof Error ? err.message : "Akses ditolak" };
   }

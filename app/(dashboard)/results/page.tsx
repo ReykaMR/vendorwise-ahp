@@ -3,6 +3,13 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth";
 import { ahpService } from "@/services/ahp.service";
 import { ResultsClient } from "./ResultsClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Hasil Perhitungan — VendorWise AHP",
+  description:
+    "Lihat hasil perhitungan AHP, bobot kriteria, skor pemasok, dan peringkat akhir.",
+};
 
 export default async function ResultsPage() {
   const session = await getServerSession(authOptions);
@@ -13,7 +20,11 @@ export default async function ResultsPage() {
   return (
     <ResultsClient
       initialResult={result.success ? result : null}
-      initialError={result.warnings.length > 0 && !result.success ? result.warnings[0] : null}
+      initialError={
+        result.warnings.length > 0 && !result.success
+          ? result.warnings[0]
+          : null
+      }
     />
   );
 }

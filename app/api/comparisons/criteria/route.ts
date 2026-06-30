@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server";
 import { comparisonService } from "@/services/comparison.service";
 import { saveComparisonSchema } from "@/lib/validations/comparison.validation";
-import { requireApiAuth, apiError, apiSuccess } from "@/lib/api-auth";
+import {
+  requireApiAuth,
+  apiError,
+  apiSuccess,
+  AuthenticationError,
+} from "@/lib/api-auth";
 
 export async function GET() {
   try {
@@ -9,7 +14,7 @@ export async function GET() {
     const matrix = await comparisonService.getMatrix(user.id);
     return apiSuccess(matrix);
   } catch (error) {
-    if (error instanceof Error && error.message === "Tidak terautentikasi") {
+    if (error instanceof AuthenticationError) {
       return apiError("Tidak terautentikasi", 401);
     }
     return apiError("Gagal memuat matriks perbandingan kriteria", 500);
@@ -23,7 +28,10 @@ export async function POST(request: NextRequest) {
     const validated = saveComparisonSchema.safeParse(body);
 
     if (!validated.success) {
-      return apiError(validated.error.flatten().fieldErrors as unknown as string, 422);
+      const firstError =
+        Object.values(validated.error.flatten().fieldErrors).flat()[0] ||
+        "Data tidak valid";
+      return apiError(firstError, 422);
     }
 
     const result = await comparisonService.saveCriteriaCell(
@@ -34,7 +42,7 @@ export async function POST(request: NextRequest) {
     );
     return apiSuccess(result, 201);
   } catch (error) {
-    if (error instanceof Error && error.message === "Tidak terautentikasi") {
+    if (error instanceof AuthenticationError) {
       return apiError("Tidak terautentikasi", 401);
     }
     if (error instanceof Error) {

@@ -23,6 +23,3 @@ export const supplierUpdateSchema = z.object({
     .optional()
     .or(z.literal("")),
 });
-
-export type SupplierCreateInput = z.infer<typeof supplierCreateSchema>;
-export type SupplierUpdateInput = z.infer<typeof supplierUpdateSchema>;

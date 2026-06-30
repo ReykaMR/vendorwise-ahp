@@ -24,21 +24,13 @@ export function ComparisonProgress({
           ) : (
             <AlertCircle className="h-5 w-5 text-amber-500" />
           )}
-          <span
-            className={
-              allFilled
-                ? "text-green-700"
-                : "text-amber-700"
-            }
-          >
+          <span className={allFilled ? "text-green-700" : "text-amber-700"}>
             {allFilled
               ? "Semua perbandingan telah diisi"
               : `${filledPairs} dari ${totalPairs} perbandingan terisi`}
           </span>
         </div>
-        <span className="text-sm font-medium text-gray-600">
-          {percentage}%
-        </span>
+        <span className="text-sm font-medium text-gray-600">{percentage}%</span>
       </div>
       <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100">
         <div

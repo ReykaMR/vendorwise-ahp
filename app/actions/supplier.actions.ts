@@ -16,6 +16,12 @@ async function requireAuth() {
   return session.user;
 }
 
+async function requireAdmin() {
+  const user = await requireAuth();
+  if (user.role !== "ADMIN") throw new Error("Akses ditolak");
+  return user;
+}
+
 export type CreateSupplierState = {
   success?: boolean;
   errors?: {
@@ -33,7 +39,7 @@ export async function createSupplier(
   formData: FormData,
 ): Promise<CreateSupplierState> {
   try {
-    await requireAuth();
+    await requireAdmin();
   } catch (err: unknown) {
     return {
       errors: { _form: [err instanceof Error ? err.message : "Akses ditolak"] },
@@ -79,7 +85,7 @@ export async function updateSupplier(
   formData: FormData,
 ): Promise<UpdateSupplierState> {
   try {
-    await requireAuth();
+    await requireAdmin();
   } catch (err: unknown) {
     return {
       errors: { _form: [err instanceof Error ? err.message : "Akses ditolak"] },
@@ -122,7 +128,7 @@ export async function deleteSupplier(
   supplierId: string,
 ): Promise<DeleteSupplierState> {
   try {
-    await requireAuth();
+    await requireAdmin();
   } catch (err: unknown) {
     return { error: err instanceof Error ? err.message : "Akses ditolak" };
   }

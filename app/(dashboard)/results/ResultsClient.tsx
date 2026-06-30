@@ -144,40 +144,37 @@ export function ResultsClient({
             </div>
           )}
 
-          {result.criteriaResult &&
-            result.criteriaResult.items.length > 0 && (
-              <div className="rounded-lg border border-gray-200 bg-white p-4">
-                <h3 className="mb-2 text-base font-semibold text-teal-800">
-                  Detail Bobot Prioritas Kriteria
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b bg-gray-50">
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">
-                          Kriteria
-                        </th>
-                        <th className="px-3 py-2 text-right font-medium text-gray-600">
-                          Bobot
-                        </th>
+          {result.criteriaResult && result.criteriaResult.items.length > 0 && (
+            <div className="rounded-lg border border-gray-200 bg-white p-4">
+              <h3 className="mb-2 text-base font-semibold text-teal-800">
+                Detail Bobot Prioritas Kriteria
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-gray-50">
+                      <th className="px-3 py-2 text-left font-medium text-gray-600">
+                        Kriteria
+                      </th>
+                      <th className="px-3 py-2 text-right font-medium text-gray-600">
+                        Bobot
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.criteriaResult.items.map((item) => (
+                      <tr key={item.id} className="border-b">
+                        <td className="px-3 py-2 text-gray-800">{item.name}</td>
+                        <td className="px-3 py-2 text-right font-medium text-teal-700">
+                          {(item.priority * 100).toFixed(2)}%
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {result.criteriaResult.items.map((item) => (
-                        <tr key={item.id} className="border-b">
-                          <td className="px-3 py-2 text-gray-800">
-                            {item.name}
-                          </td>
-                          <td className="px-3 py-2 text-right font-medium text-teal-700">
-                            {(item.priority * 100).toFixed(2)}%
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            )}
+            </div>
+          )}
 
           {result.supplierResults.length > 0 && (
             <div className="rounded-lg border border-gray-200 bg-white p-4">

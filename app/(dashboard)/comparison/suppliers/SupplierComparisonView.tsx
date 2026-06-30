@@ -31,18 +31,15 @@ export function SupplierComparisonView({
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleCriteriaChange = useCallback(
-    async (criteriaId: string) => {
-      setIsLoading(true);
-      const result = await getSupplierMatrix(criteriaId);
-      setIsLoading(false);
+  const handleCriteriaChange = useCallback(async (criteriaId: string) => {
+    setIsLoading(true);
+    const result = await getSupplierMatrix(criteriaId);
+    setIsLoading(false);
 
-      if (result.success && result.data) {
-        setMatrixData(result.data);
-      }
-    },
-    [],
-  );
+    if (result.success && result.data) {
+      setMatrixData(result.data);
+    }
+  }, []);
 
   if (allCriteria.length === 0) {
     return (

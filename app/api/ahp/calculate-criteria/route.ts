@@ -3,7 +3,12 @@ import { comparisonRepository } from "@/repositories/comparison.repository";
 import { priorityRepository } from "@/repositories/priority.repository";
 import { calculatePriorities } from "@/lib/ahp/priority";
 import type { ComparisonInput } from "@/lib/ahp/matrix";
-import { requireApiAuth, apiError, apiSuccess } from "@/lib/api-auth";
+import {
+  requireApiAuth,
+  apiError,
+  apiSuccess,
+  AuthenticationError,
+} from "@/lib/api-auth";
 
 export async function POST() {
   try {
@@ -14,8 +19,9 @@ export async function POST() {
       return apiError("Minimal 2 kriteria utama diperlukan", 400);
     }
 
-    const criteriaComparisons =
-      await comparisonRepository.findCriteriaByUser(user.id);
+    const criteriaComparisons = await comparisonRepository.findCriteriaByUser(
+      user.id,
+    );
     if (criteriaComparisons.length === 0) {
       return apiError("Belum ada perbandingan kriteria", 400);
     }
@@ -50,7 +56,7 @@ export async function POST() {
 
     return apiSuccess(result);
   } catch (error) {
-    if (error instanceof Error && error.message === "Tidak terautentikasi") {
+    if (error instanceof AuthenticationError) {
       return apiError("Tidak terautentikasi", 401);
     }
     if (error instanceof Error) {

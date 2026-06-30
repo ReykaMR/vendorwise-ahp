@@ -5,6 +5,13 @@ import { authOptions } from "@/lib/auth/auth";
 import { comparisonService } from "@/services/comparison.service";
 import { criteriaRepository } from "@/repositories/criteria.repository";
 import { SupplierComparisonView } from "./SupplierComparisonView";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Perbandingan Pemasok — VendorWise AHP",
+  description:
+    "Lakukan perbandingan berpasangan antar pemasok untuk setiap kriteria.",
+};
 
 export default async function SuppliersComparisonPage() {
   const session = await getServerSession(authOptions);

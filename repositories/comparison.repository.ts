@@ -7,9 +7,7 @@ import type {
 export const comparisonRepository = {
   // ---- Criteria Comparison ----
 
-  async findCriteriaByUser(
-    userId: string,
-  ): Promise<CriteriaComparison[]> {
+  async findCriteriaByUser(userId: string): Promise<CriteriaComparison[]> {
     return prisma.criteriaComparison.findMany({
       where: { userId },
     });
@@ -39,13 +37,6 @@ export const comparisonRepository = {
         value,
       },
     });
-  },
-
-  async deleteCriteriaByUser(userId: string): Promise<number> {
-    const result = await prisma.criteriaComparison.deleteMany({
-      where: { userId },
-    });
-    return result.count;
   },
 
   // ---- Supplier Comparison ----
@@ -86,15 +77,5 @@ export const comparisonRepository = {
         value,
       },
     });
-  },
-
-  async deleteSupplierByUserAndCriteria(
-    userId: string,
-    criteriaId: string,
-  ): Promise<number> {
-    const result = await prisma.supplierComparison.deleteMany({
-      where: { userId, criteriaId },
-    });
-    return result.count;
   },
 };

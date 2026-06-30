@@ -4,7 +4,12 @@ import { comparisonRepository } from "@/repositories/comparison.repository";
 import { priorityRepository } from "@/repositories/priority.repository";
 import { calculatePriorities } from "@/lib/ahp/priority";
 import type { ComparisonInput } from "@/lib/ahp/matrix";
-import { requireApiAuth, apiError, apiSuccess } from "@/lib/api-auth";
+import {
+  requireApiAuth,
+  apiError,
+  apiSuccess,
+  AuthenticationError,
+} from "@/lib/api-auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     return apiSuccess(result);
   } catch (error) {
-    if (error instanceof Error && error.message === "Tidak terautentikasi") {
+    if (error instanceof AuthenticationError) {
       return apiError("Tidak terautentikasi", 401);
     }
     if (error instanceof Error) {

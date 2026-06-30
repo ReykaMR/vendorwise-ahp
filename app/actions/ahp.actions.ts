@@ -45,10 +45,7 @@ export async function getResults(): Promise<CalculateAHPState> {
     return { success: true, data: result };
   } catch (error) {
     return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Gagal memuat hasil AHP",
+      error: error instanceof Error ? error.message : "Gagal memuat hasil AHP",
     };
   }
 }

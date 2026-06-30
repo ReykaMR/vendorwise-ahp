@@ -54,8 +54,7 @@ export function SupplierMatrix({
         const next = prev.map((r) => r.map((c) => ({ ...c })));
         next[rowIdx][colIdx].value = newValue;
 
-        const reciprocal =
-          Math.abs(newValue) < 1e-10 ? null : 1 / newValue;
+        const reciprocal = Math.abs(newValue) < 1e-10 ? null : 1 / newValue;
         if (reciprocal !== null) {
           next[colIdx][rowIdx].value = reciprocal;
         }
@@ -158,7 +157,7 @@ export function SupplierMatrix({
       <ComparisonProgress totalPairs={totalPairs} filledPairs={filledPairs} />
 
       <div className="overflow-x-auto rounded-lg border border-gray-200">
-        <table className="w-full min-w-[400px] border-collapse text-sm">
+        <table className="w-full min-w-100 border-collapse text-sm">
           <thead>
             <tr>
               <th className="sticky left-0 z-10 border-b border-r bg-teal-50 px-3 py-2 text-left font-semibold text-teal-800">
@@ -215,9 +214,7 @@ export function SupplierMatrix({
           <div>1/5 = Kuat kurang penting</div>
           <div>1/7 = Sangat kuat kurang penting</div>
           <div>1/9 = Ekstrem kurang penting</div>
-          <div className="md:col-span-2">
-            1/2, 1/4, 1/6, 1/8 = Nilai antara
-          </div>
+          <div className="md:col-span-2">1/2, 1/4, 1/6, 1/8 = Nilai antara</div>
         </div>
       </details>
     </div>
