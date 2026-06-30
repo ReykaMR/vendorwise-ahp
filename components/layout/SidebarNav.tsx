@@ -12,12 +12,12 @@ import {
   UserCog,
 } from "lucide-react";
 
-interface NavItem {
+type NavItem = {
   title: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   roles?: ("ADMIN" | "USER")[];
-}
+};
 
 const navItems: NavItem[] = [
   {
@@ -64,10 +64,10 @@ const navItems: NavItem[] = [
   },
 ];
 
-interface SidebarNavProps {
+type SidebarNavProps = {
   role?: "ADMIN" | "USER";
-  onItemClick?: () => void; // untuk menutup mobile sidebar
-}
+  onItemClick?: () => void;
+};
 
 export function SidebarNav({ role = "USER", onItemClick }: SidebarNavProps) {
   const pathname = usePathname();

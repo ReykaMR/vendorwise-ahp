@@ -12,9 +12,9 @@ import { SidebarNav } from "./SidebarNav";
 import Link from "next/link";
 import { useSidebar } from "@/hooks/useSidebar";
 
-interface MobileSidebarProps {
+type MobileSidebarProps = {
   role?: "ADMIN" | "USER";
-}
+};
 
 export function MobileSidebar({ role = "USER" }: MobileSidebarProps) {
   const { isOpen, setIsOpen, toggle } = useSidebar();

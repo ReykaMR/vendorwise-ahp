@@ -42,3 +42,8 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+PROJECT.md
+TASK.md
+FEATURES.md
+AUDIT.md

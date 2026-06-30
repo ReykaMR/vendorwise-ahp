@@ -27,12 +27,12 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, User, Mail, CheckCircle2 } from "lucide-react";
 
-interface ProfileFormProps {
+type ProfileFormProps = {
   defaultValues: {
     name: string;
     email: string;
   };
-}
+};
 
 export function ProfileForm({ defaultValues }: ProfileFormProps) {
   const [state, formAction, isPending] = useActionState(updateProfile, null);

@@ -119,16 +119,16 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;        /* Putih */
-    --foreground: 180 10% 20%;      /* Teal gelap untuk teks */
+    --background: 0 0% 100%; /* Putih */
+    --foreground: 180 10% 20%; /* Teal gelap untuk teks */
 
-    --primary: 174 72% 42%;         /* Teal / Hijau Kebiruan */
+    --primary: 174 72% 42%; /* Teal / Hijau Kebiruan */
     --primary-foreground: 0 0% 100%;
 
-    --accent: 30 100% 60%;          /* Oranye / Kuning Muda */
+    --accent: 30 100% 60%; /* Oranye / Kuning Muda */
     --accent-foreground: 180 10% 20%;
 
-    --ring: 174 72% 42%;            /* Warna fokus = primer */
+    --ring: 174 72% 42%; /* Warna fokus = primer */
   }
   * {
     @apply border-border outline-ring/50;
