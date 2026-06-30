@@ -29,19 +29,19 @@ Sistem Pendukung Keputusan (SPK) berbasis web untuk pemilihan pemasok bahan baku
 
 # Tumpukan Teknologi
 
-- Next.js 16 (App Router)
-- TypeScript (Mode Ketat)
+- Next.js 16 (App Router, Turbopack)
+- TypeScript (strict)
 - Tailwind CSS 4
-- shadcn/ui
-- Radix UI
-- Prisma 7
-- PostgreSQL 18
-- Auth.js (NextAuth)
-- Zod
-- React Hook Form
+- shadcn/ui + Radix UI
+- Prisma 7 ORM + PostgreSQL 18
+- Auth.js (NextAuth) — Credentials + JWT
+- Zod + React Hook Form + @hookform/resolvers
 - bcryptjs
+- Recharts
+- jsPDF + jsPDF-AutoTable + SheetJS (xlsx)
 - Lucide React
-- Sonner
+- Sonner (toast)
+- class-variance-authority + clsx + tailwind-merge
 
 ---
 
@@ -85,20 +85,18 @@ Jangan pernah mengakses Prisma langsung dari halaman atau komponen UI.
 
 # Konvensi Folder
 
-Ikuti struktur ini:
+Gunakan struktur folder berikut secara konsisten:
 
-- `app/`
-- `components/`
-- `features/`
-- `lib/`
-- `services/`
-- `repositories/`
-- `hooks/`
-- `types/`
-- `utils/`
-- `generated/`
+- `app/` — Halaman (App Router), Route Handlers, Server Actions
+- `components/` — Komponen React UI
+- `lib/` — Utilitas, validasi Zod, engine AHP, helper export
+- `services/` — Lapisan logika bisnis
+- `repositories/` — Lapisan akses data (Prisma)
+- `types/` — Tipe TypeScript global (next-auth.d.ts)
 
 Jangan membuat folder tingkat atas baru kecuali benar-benar diperlukan.
+
+Folder `features/`, `hooks/`, `utils/` tidak digunakan — simpan logika di folder di atas.
 
 ---
 
@@ -142,11 +140,21 @@ Jangan pernah mengandalkan otorisasi sisi klien.
 
 Skema Prisma adalah sumber kebenaran tunggal.
 
+Model yang digunakan (11 model):
+
+- User
+- Account, Session, VerificationToken (NextAuth PrismaAdapter)
+- Criteria (hierarki self-referential)
+- Supplier
+- CriteriaComparison, SupplierComparison
+- CriteriaPriority, SupplierPriority
+- CalculationHistory (riwayat perhitungan AHP)
+
 Jika skema berubah:
 
 1. Perbarui `schema.prisma`
-2. Jalankan migrasi
-3. Bangkitkan Prisma Client
+2. Jalankan `npx prisma migrate dev`
+3. Jalankan `npx prisma generate`
 
 Jangan mengubah basis data secara manual kecuali benar-benar diminta.
 

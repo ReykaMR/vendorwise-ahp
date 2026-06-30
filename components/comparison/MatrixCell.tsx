@@ -60,11 +60,7 @@ function formatValue(val: number | null): string {
   return `1/${Math.round(1 / val)}`;
 }
 
-export function MatrixCell({
-  value,
-  isReadonly,
-  onChange,
-}: MatrixCellProps) {
+export function MatrixCell({ value, isReadonly, onChange }: MatrixCellProps) {
   if (isReadonly) {
     const display = value !== null ? formatValue(value) : "-";
     return (
@@ -87,10 +83,7 @@ export function MatrixCell({
       }}
     >
       <SelectTrigger className="h-10 w-full border-teal-200 bg-white text-sm focus:ring-teal-500">
-        <SelectValue
-          placeholder="—"
-          className="text-gray-400"
-        />
+        <SelectValue placeholder="—" className="text-gray-400" />
       </SelectTrigger>
       <SelectContent>
         {SAATY_VALUES.map((s) => (

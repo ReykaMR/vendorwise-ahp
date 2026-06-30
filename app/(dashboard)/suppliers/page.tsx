@@ -6,6 +6,12 @@ import { SuppliersDataTable } from "@/components/suppliers/SuppliersDataTable";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Daftar Pemasok — VendorWise AHP",
+  description: "Kelola data pemasok bahan baku untuk penilaian AHP.",
+};
 
 export default async function SuppliersPage() {
   const session = await getServerSession(authOptions);

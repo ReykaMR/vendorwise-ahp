@@ -40,7 +40,10 @@ export function CriteriaWeightChart({ data }: CriteriaWeightChartProps) {
       <h3 className="mb-4 text-base font-semibold text-teal-800">
         Bobot Prioritas Kriteria
       </h3>
-      <ResponsiveContainer width="100%" height={Math.max(200, data.length * 50)}>
+      <ResponsiveContainer
+        width="100%"
+        height={Math.max(200, data.length * 50)}
+      >
         <BarChart
           data={chartData}
           layout="vertical"

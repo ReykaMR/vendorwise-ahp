@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma db push",
+    "db:setup": "tsx prisma/setup.ts",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "tsx prisma/reset.ts && npm run db:setup && npm run db:seed",
+    "db:truncate": "tsx prisma/reset.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -68,10 +68,7 @@ export const comparisonService = {
           const storedValue = comparisonMap.get(key);
 
           if (storedValue !== undefined) {
-            value =
-              sorted[i].id < sorted[j].id
-                ? storedValue
-                : 1 / storedValue;
+            value = sorted[i].id < sorted[j].id ? storedValue : 1 / storedValue;
           }
 
           isReadonly = sorted[i].id > sorted[j].id;
@@ -109,27 +106,6 @@ export const comparisonService = {
       second,
       storedValue,
     );
-  },
-
-  async saveAllCriteria(
-    userId: string,
-    comparisons: {
-      criteria1Id: string;
-      criteria2Id: string;
-      value: number;
-    }[],
-  ): Promise<number> {
-    let count = 0;
-    for (const comp of comparisons) {
-      await this.saveCriteriaCell(
-        userId,
-        comp.criteria1Id,
-        comp.criteria2Id,
-        comp.value,
-      );
-      count++;
-    }
-    return count;
   },
 
   // ---- Supplier Matrix ----
@@ -182,10 +158,7 @@ export const comparisonService = {
           const storedValue = comparisonMap.get(key);
 
           if (storedValue !== undefined) {
-            value =
-              sorted[i].id < sorted[j].id
-                ? storedValue
-                : 1 / storedValue;
+            value = sorted[i].id < sorted[j].id ? storedValue : 1 / storedValue;
           }
 
           isReadonly = sorted[i].id > sorted[j].id;

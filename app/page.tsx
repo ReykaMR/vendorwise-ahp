@@ -23,7 +23,7 @@ export default async function HomePage() {
   if (session?.user) redirect("/dashboard");
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-teal-50 to-white">
+    <div className="min-h-screen flex flex-col bg-linear-to-b from-teal-50 to-white">
       <header className="border-b border-teal-100 bg-white/80 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">

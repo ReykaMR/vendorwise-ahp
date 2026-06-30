@@ -2,6 +2,12 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth";
 import { SettingsForm } from "./SettingsForm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pengaturan — VendorWise AHP",
+  description: "Pengaturan akun VendorWise AHP.",
+};
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
@@ -10,9 +16,7 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-teal-800">
-          Pengaturan
-        </h1>
+        <h1 className="text-3xl font-bold text-teal-800">Pengaturan</h1>
         <p className="mt-1 text-sm text-gray-500">
           Informasi akun Anda saat ini
         </p>

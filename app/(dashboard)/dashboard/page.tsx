@@ -11,6 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Package, ListTree, Layers, BarChart3 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard — VendorWise AHP",
+  description: "Ringkasan data pemasok dan kriteria VendorWise AHP.",
+};
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);

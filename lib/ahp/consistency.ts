@@ -1,10 +1,10 @@
 import { multiplyMatrixVector } from "./matrix";
 
 const RI: number[] = [
-  0,    // n=1
-  0,    // n=2
+  0, // n=1
+  0, // n=2
   0.58, // n=3
-  0.90, // n=4
+  0.9, // n=4
   1.12, // n=5
   1.24, // n=6
   1.32, // n=7

@@ -6,7 +6,7 @@ import { UserForm } from "@/components/admin/UserForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type EditUserPageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function EditUserPage({ params }: EditUserPageProps) {
@@ -15,7 +15,8 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
     redirect("/dashboard");
   }
 
-  const user = await userService.getById(params.id);
+  const { id } = await params;
+  const user = await userService.getById(id);
 
   if (!user) notFound();
 

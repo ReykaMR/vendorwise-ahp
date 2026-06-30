@@ -1,4 +1,9 @@
-import { requireApiAuth, apiError, apiSuccess } from "@/lib/api-auth";
+import {
+  requireApiAuth,
+  apiError,
+  apiSuccess,
+  AuthenticationError,
+} from "@/lib/api-auth";
 import { ahpService } from "@/services/ahp.service";
 
 export async function GET() {
@@ -7,7 +12,7 @@ export async function GET() {
     const result = await ahpService.getLastResults(user.id);
     return apiSuccess(result);
   } catch (error) {
-    if (error instanceof Error && error.message === "Tidak terautentikasi") {
+    if (error instanceof AuthenticationError) {
       return apiError("Tidak terautentikasi", 401);
     }
     if (error instanceof Error) {

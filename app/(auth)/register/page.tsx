@@ -2,6 +2,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
 import { RegisterForm } from "@/components/auth/RegisterForm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Daftar — VendorWise AHP",
+  description: "Halaman pendaftaran akun baru VendorWise AHP.",
+};
 
 export default async function RegisterPage() {
   const session = await getServerSession(authOptions);

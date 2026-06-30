@@ -44,9 +44,7 @@ export function buildPairwiseMatrix(
             `Perbandingan antara "${sorted[i].name}" dan "${sorted[j].name}" belum diisi`,
           );
         }
-        row.push(
-          sorted[i].id < sorted[j].id ? storedValue : 1 / storedValue,
-        );
+        row.push(sorted[i].id < sorted[j].id ? storedValue : 1 / storedValue);
       }
     }
     matrix.push(row);

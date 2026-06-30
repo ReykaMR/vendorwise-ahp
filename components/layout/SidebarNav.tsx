@@ -10,6 +10,7 @@ import {
   BarChart3,
   Package,
   UserCog,
+  History,
 } from "lucide-react";
 
 type NavItem = {
@@ -48,6 +49,12 @@ const navItems: NavItem[] = [
     title: "Hasil AHP",
     href: "/results",
     icon: BarChart3,
+    roles: ["ADMIN", "USER"],
+  },
+  {
+    title: "Riwayat",
+    href: "/history",
+    icon: History,
     roles: ["ADMIN", "USER"],
   },
   {

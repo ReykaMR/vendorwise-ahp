@@ -4,6 +4,12 @@ import { authOptions } from "@/lib/auth/auth";
 import { userService } from "@/services/user.service";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ChangePasswordForm } from "@/components/profile/ChangePasswordForm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Profil — VendorWise AHP",
+  description: "Pengaturan profil pengguna VendorWise AHP.",
+};
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);

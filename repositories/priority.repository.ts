@@ -9,7 +9,9 @@ export const priorityRepository = {
 
   async findByUser(
     userId: string,
-  ): Promise<(CriteriaPriority & { criteria: { id: string; name: string } })[]> {
+  ): Promise<
+    (CriteriaPriority & { criteria: { id: string; name: string } })[]
+  > {
     return prisma.criteriaPriority.findMany({
       where: { userId },
       include: { criteria: { select: { id: true, name: true } } },
@@ -50,7 +52,12 @@ export const priorityRepository = {
 
   async findSupplierByUser(
     userId: string,
-  ): Promise<(SupplierPriority & { criteria: { name: string }; supplier: { name: string } })[]> {
+  ): Promise<
+    (SupplierPriority & {
+      criteria: { name: string };
+      supplier: { name: string };
+    })[]
+  > {
     return prisma.supplierPriority.findMany({
       where: { userId },
       include: {
@@ -74,6 +81,7 @@ export const priorityRepository = {
     criteriaId: string,
     supplierId: string,
     priority: number,
+    consistencyRatio?: number,
   ): Promise<SupplierPriority> {
     return prisma.supplierPriority.upsert({
       where: {
@@ -84,9 +92,11 @@ export const priorityRepository = {
         criteriaId,
         supplierId,
         priority,
+        consistencyRatio,
       },
       update: {
         priority,
+        consistencyRatio,
       },
     });
   },
@@ -97,13 +107,6 @@ export const priorityRepository = {
   ): Promise<number> {
     const result = await prisma.supplierPriority.deleteMany({
       where: { userId, criteriaId },
-    });
-    return result.count;
-  },
-
-  async deleteSupplierByUser(userId: string): Promise<number> {
-    const result = await prisma.supplierPriority.deleteMany({
-      where: { userId },
     });
     return result.count;
   },

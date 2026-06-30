@@ -35,6 +35,9 @@ model User {
   accounts            Account[]
   sessions            Session[]
 
+  // Riwayat perhitungan
+  calculationHistories CalculationHistory[]
+
   @@map("users")
 }
 
@@ -229,13 +232,14 @@ model CriteriaPriority {
 // Digunakan untuk menghitung total skor akhir alternatif
 // ------------------------------------------------------------
 model SupplierPriority {
-  id          String   @id @default(cuid())
-  userId      String   @map("user_id")
-  criteriaId  String   @map("criteria_id")
-  supplierId  String   @map("supplier_id")
-  priority    Float    // Bobot prioritas pemasok pada kriteria tertentu
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String   @id @default(cuid())
+  userId           String   @map("user_id")
+  criteriaId       String   @map("criteria_id")
+  supplierId       String   @map("supplier_id")
+  priority         Float    // Bobot prioritas pemasok pada kriteria tertentu
+  consistencyRatio Float?   @map("consistency_ratio") // CR hasil perhitungan (opsional)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relasi
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -247,4 +251,23 @@ model SupplierPriority {
   @@index([userId])
   @@index([criteriaId])
   @@map("supplier_priorities")
+}
+
+// ------------------------------------------------------------
+// Model: CalculationHistory
+// Riwayat hasil perhitungan AHP — menyimpan snapshot JSON dari
+// seluruh hasil perhitungan untuk keperluan histori dan komparasi
+// ------------------------------------------------------------
+model CalculationHistory {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  label      String?  // Label opsional (misal "Perhitungan Q2 2026")
+  data       Json     // Snapshot lengkap AHPResult (criteria, suppliers, ranking, warnings)
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("calculation_histories")
 }

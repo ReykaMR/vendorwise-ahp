@@ -37,7 +37,11 @@ export const userService = {
     id: string,
     data: { name?: string; email?: string; role?: "ADMIN" | "USER" },
   ) {
-    const updateData: Record<string, string> = {};
+    const updateData: {
+      name?: string;
+      email?: string;
+      role?: "ADMIN" | "USER";
+    } = {};
     if (data.name) updateData.name = data.name;
     if (data.email) updateData.email = data.email.toLowerCase();
     if (data.role) updateData.role = data.role;

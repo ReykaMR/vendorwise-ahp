@@ -86,16 +86,18 @@ export function SupplierScoreChart({ ranking }: SupplierScoreChartProps) {
               fontSize: "13px",
             }}
           />
-          <Legend
-            wrapperStyle={{ fontSize: "12px", paddingTop: "8px" }}
-          />
+          <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "8px" }} />
           {allCriteriaNames.map((name, index) => (
             <Bar
               key={name}
               dataKey={name}
               stackId="a"
               fill={COLORS[index % COLORS.length]}
-              radius={index === allCriteriaNames.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+              radius={
+                index === allCriteriaNames.length - 1
+                  ? [4, 4, 0, 0]
+                  : [0, 0, 0, 0]
+              }
             />
           ))}
         </BarChart>

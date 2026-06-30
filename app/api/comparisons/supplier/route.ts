@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server";
 import { comparisonService } from "@/services/comparison.service";
 import { saveSupplierComparisonSchema } from "@/lib/validations/comparison.validation";
-import { requireApiAuth, apiError, apiSuccess } from "@/lib/api-auth";
+import {
+  requireApiAuth,
+  apiError,
+  apiSuccess,
+  AuthenticationError,
+} from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +24,7 @@ export async function GET(request: NextRequest) {
     );
     return apiSuccess(matrix);
   } catch (error) {
-    if (error instanceof Error && error.message === "Tidak terautentikasi") {
+    if (error instanceof AuthenticationError) {
       return apiError("Tidak terautentikasi", 401);
     }
     if (error instanceof Error) {
@@ -36,7 +41,10 @@ export async function POST(request: NextRequest) {
     const validated = saveSupplierComparisonSchema.safeParse(body);
 
     if (!validated.success) {
-      return apiError(validated.error.flatten().fieldErrors as unknown as string, 422);
+      const firstError =
+        Object.values(validated.error.flatten().fieldErrors).flat()[0] ||
+        "Data tidak valid";
+      return apiError(firstError, 422);
     }
 
     const result = await comparisonService.saveSupplierCell(
@@ -48,7 +56,7 @@ export async function POST(request: NextRequest) {
     );
     return apiSuccess(result, 201);
   } catch (error) {
-    if (error instanceof Error && error.message === "Tidak terautentikasi") {
+    if (error instanceof AuthenticationError) {
       return apiError("Tidak terautentikasi", 401);
     }
     if (error instanceof Error) {

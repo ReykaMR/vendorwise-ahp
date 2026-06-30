@@ -125,6 +125,12 @@ export const criteriaService = {
   },
 
   async delete(id: string) {
+    const children = await criteriaRepository.findChildren(id);
+    if (children.length > 0) {
+      throw new Error(
+        `Kriteria ini memiliki ${children.length} sub-kriteria. Hapus sub-kriteria terlebih dahulu.`,
+      );
+    }
     return criteriaRepository.delete(id);
   },
 

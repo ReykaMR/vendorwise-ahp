@@ -4,6 +4,13 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth/auth";
 import { comparisonService } from "@/services/comparison.service";
 import { CriteriaMatrix } from "@/components/comparison/CriteriaMatrix";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Perbandingan Kriteria — VendorWise AHP",
+  description:
+    "Lakukan perbandingan berpasangan antar kriteria menggunakan skala Saaty 1–9.",
+};
 
 export default async function CriteriaComparisonPage() {
   const session = await getServerSession(authOptions);
@@ -19,8 +26,8 @@ export default async function CriteriaComparisonPage() {
             Perbandingan Berpasangan
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Bandingkan tingkat kepentingan antar kriteria atau pemasok menggunakan
-            skala Saaty 1–9
+            Bandingkan tingkat kepentingan antar kriteria atau pemasok
+            menggunakan skala Saaty 1–9
           </p>
         </div>
       </div>

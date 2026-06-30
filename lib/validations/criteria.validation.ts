@@ -11,6 +11,3 @@ export const criteriaUpdateSchema = z.object({
   description: z.string().optional(),
   parentId: z.string().optional(),
 });
-
-export type CriteriaCreateInput = z.infer<typeof criteriaCreateSchema>;
-export type CriteriaUpdateInput = z.infer<typeof criteriaUpdateSchema>;

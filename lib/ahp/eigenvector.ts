@@ -5,9 +5,7 @@ import {
   buildPairwiseMatrix,
 } from "./matrix";
 
-export function calculateEigenvector(
-  matrix: number[][],
-): number[] {
+export function calculateEigenvector(matrix: number[][]): number[] {
   const normalized = normalizeColumns(matrix);
   const n = normalized.length;
   const eigenvector: number[] = [];
@@ -26,8 +24,16 @@ export function calculateEigenvector(
 export function calculateEigenvectorFromComparisons(
   entities: EntityInfo[],
   comparisons: ComparisonInput[],
-): { eigenvector: number[]; matrix: number[][]; labels: string[]; entityIds: string[] } {
-  const { matrix, labels, entityIds } = buildPairwiseMatrix(entities, comparisons);
+): {
+  eigenvector: number[];
+  matrix: number[][];
+  labels: string[];
+  entityIds: string[];
+} {
+  const { matrix, labels, entityIds } = buildPairwiseMatrix(
+    entities,
+    comparisons,
+  );
   const eigenvector = calculateEigenvector(matrix);
   return { eigenvector, matrix, labels, entityIds };
 }

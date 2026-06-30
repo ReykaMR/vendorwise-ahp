@@ -6,7 +6,7 @@ import { CriteriaForm } from "@/components/criteria/CriteriaForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type EditCriteriaPageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function EditCriteriaPage({
@@ -15,7 +15,8 @@ export default async function EditCriteriaPage({
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login");
 
-  const criteria = await criteriaService.getById(params.id);
+  const { id } = await params;
+  const criteria = await criteriaService.getById(id);
   if (!criteria) notFound();
 
   const parents = await criteriaService.getAvailableParents(criteria.id);

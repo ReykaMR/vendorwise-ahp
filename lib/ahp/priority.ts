@@ -1,6 +1,4 @@
-import {
-  calculateEigenvectorFromComparisons,
-} from "./eigenvector";
+import { calculateEigenvectorFromComparisons } from "./eigenvector";
 import { analyzeConsistency } from "./consistency";
 import type { EntityInfo, ComparisonInput } from "./matrix";
 
