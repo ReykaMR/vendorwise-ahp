@@ -2,9 +2,14 @@ import { criteriaRepository } from "@/repositories/criteria.repository";
 import { supplierRepository } from "@/repositories/supplier.repository";
 import { comparisonRepository } from "@/repositories/comparison.repository";
 import { priorityRepository } from "@/repositories/priority.repository";
+import { Prisma } from "@/app/generated/prisma/client";
 import { calculatePriorities } from "@/lib/ahp/priority";
 import { calculateFinalScores, type SupplierScore } from "@/lib/ahp/final-score";
 import type { ComparisonInput } from "@/lib/ahp/matrix";
+
+type CriteriaPriorityWithCriteria = Prisma.CriteriaPriorityGetPayload<{
+  include: { criteria: { select: { id: true; name: true } } };
+}>;
 
 export type AHPResult = {
   success: boolean;
@@ -240,6 +245,130 @@ export const ahpService = {
     }
 
     const ranking = calculateFinalScores(criteriaWeights, allSupplierPriorities);
+
+    return {
+      success: true,
+      criteriaResult,
+      supplierResults,
+      ranking,
+      warnings,
+    };
+  },
+
+  async getLastResults(userId: string): Promise<AHPResult> {
+    const criteriaPriorities = await priorityRepository.findByUser(userId) as CriteriaPriorityWithCriteria[];
+
+    if (criteriaPriorities.length === 0) {
+      return {
+        success: false,
+        criteriaResult: null,
+        supplierResults: [],
+        ranking: [],
+        warnings: ["Belum ada perhitungan AHP. Klik 'Hitung AHP' untuk memulai."],
+      };
+    }
+
+    const consistencyRatio =
+      criteriaPriorities[0].consistencyRatio ?? null;
+    const allCrValues = criteriaPriorities
+      .map((cp) => cp.consistencyRatio)
+      .filter((cr): cr is number => cr !== null);
+
+    const avgCr =
+      allCrValues.length > 0
+        ? allCrValues.reduce((a, b) => a + b, 0) / allCrValues.length
+        : 0;
+
+    const criteriaResult: AHPResult["criteriaResult"] = {
+      items: criteriaPriorities.map((cp) => ({
+        id: cp.criteriaId,
+        name: cp.criteria.name,
+        priority: cp.priority,
+      })),
+      consistency: {
+        lambdaMax: 0,
+        ci: 0,
+        ri: 0,
+        cr: consistencyRatio ?? avgCr,
+        isConsistent: (consistencyRatio ?? avgCr) < 0.1,
+      },
+    };
+
+    const supplierData = await priorityRepository.findSupplierByUser(userId);
+
+    const groupedSuppliers = new Map<
+      string,
+      { criteriaName: string; items: { id: string; name: string; priority: number }[]; crs: number[] }
+    >();
+    for (const sp of supplierData) {
+      if (!groupedSuppliers.has(sp.criteriaId)) {
+        groupedSuppliers.set(sp.criteriaId, {
+          criteriaName: sp.criteria.name,
+          items: [],
+          crs: [],
+        });
+      }
+      const group = groupedSuppliers.get(sp.criteriaId)!;
+      if (!group.items.find((i) => i.id === sp.supplierId)) {
+        group.items.push({
+          id: sp.supplierId,
+          name: sp.supplier.name,
+          priority: sp.priority,
+        });
+      }
+    }
+
+    const supplierResults: AHPResult["supplierResults"] = [];
+    for (const [criteriaId, group] of groupedSuppliers) {
+      group.items.sort((a, b) => b.priority - a.priority);
+      supplierResults.push({
+        criteriaId,
+        criteriaName: group.criteriaName,
+        items: group.items,
+        consistency: {
+          lambdaMax: 0,
+          ci: 0,
+          ri: 0,
+          cr: 0,
+          isConsistent: true,
+        },
+      });
+    }
+
+    const criteriaWeights = criteriaResult.items.map((item) => ({
+      criteriaId: item.id,
+      criteriaName: item.name,
+      priority: item.priority,
+    }));
+
+    const allSupplierPriorities: {
+      criteriaId: string;
+      criteriaName: string;
+      supplierId: string;
+      supplierName: string;
+      priority: number;
+    }[] = [];
+
+    for (const sr of supplierResults) {
+      for (const item of sr.items) {
+        allSupplierPriorities.push({
+          criteriaId: sr.criteriaId,
+          criteriaName: sr.criteriaName,
+          supplierId: item.id,
+          supplierName: item.name,
+          priority: item.priority,
+        });
+      }
+    }
+
+    const ranking = calculateFinalScores(criteriaWeights, allSupplierPriorities);
+
+    const warnings: string[] = [];
+    if (!criteriaResult.consistency.isConsistent) {
+      warnings.push(
+        `Rasio Konsistensi (CR) kriteria = ${criteriaResult.consistency.cr.toFixed(4)} (> 0.1). Perbandingan tidak konsisten.`,
+      );
+    }
 
     return {
       success: true,

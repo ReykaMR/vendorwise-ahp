@@ -7,10 +7,12 @@ import type {
 export const priorityRepository = {
   // ---- Criteria Priority ----
 
-  async findByUser(userId: string): Promise<CriteriaPriority[]> {
+  async findByUser(
+    userId: string,
+  ): Promise<(CriteriaPriority & { criteria: { id: string; name: string } })[]> {
     return prisma.criteriaPriority.findMany({
       where: { userId },
-      include: { criteria: { select: { name: true } } },
+      include: { criteria: { select: { id: true, name: true } } },
     });
   },
 
