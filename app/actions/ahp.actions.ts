@@ -33,3 +33,22 @@ export async function calculateAHP(): Promise<CalculateAHPState> {
     };
   }
 }
+
+export async function getResults(): Promise<CalculateAHPState> {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return { error: "Tidak terautentikasi" };
+    }
+
+    const result = await ahpService.getLastResults(session.user.id);
+    return { success: true, data: result };
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "Gagal memuat hasil AHP",
+    };
+  }
+}
