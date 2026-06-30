@@ -40,7 +40,7 @@ const navItems: NavItem[] = [
   },
   {
     title: "Perbandingan",
-    href: "/comparison/criteria",
+    href: "/comparison",
     icon: Settings,
     roles: ["ADMIN", "USER"],
   },

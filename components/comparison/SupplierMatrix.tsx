@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MatrixCell } from "@/components/comparison/MatrixCell";
-import { saveCriteriaCell } from "@/app/actions/comparison.actions";
+import { saveSupplierCell } from "@/app/actions/comparison.actions";
 import { Loader2, Info } from "lucide-react";
 import { toast } from "sonner";
+import { CriteriaNavigator } from "@/components/comparison/CriteriaNavigator";
 
-type CriteriaItem = {
+type SupplierItem = {
   id: string;
   name: string;
 };
@@ -18,23 +19,33 @@ type MatrixCellData = {
   isReadonly: boolean;
 };
 
-type CriteriaMatrixData = {
-  criteria: CriteriaItem[];
+type SupplierMatrixData = {
+  criteriaId: string;
+  criteriaName: string;
+  suppliers: SupplierItem[];
   cells: MatrixCellData[][];
 };
 
-type CriteriaMatrixProps = {
-  initialData: CriteriaMatrixData;
+type SupplierMatrixProps = {
+  allCriteria: { id: string; name: string }[];
+  initialData: SupplierMatrixData;
+  onCriteriaChange: (criteriaId: string) => void;
 };
 
-export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
-  const [matrix, setMatrix] = useState<MatrixCellData[][]>(
-    initialData.cells,
-  );
+export function SupplierMatrix({
+  allCriteria,
+  initialData,
+  onCriteriaChange,
+}: SupplierMatrixProps) {
+  const [matrix, setMatrix] = useState<MatrixCellData[][]>(initialData.cells);
   const [loading, setLoading] = useState(false);
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(
     new Map(),
   );
+
+  const criteriaName = initialData.criteriaName;
+  const suppliers = initialData.suppliers;
+  const selectedCriteriaId = initialData.criteriaId;
 
   const handleChange = useCallback(
     (rowIdx: number, colIdx: number, newValue: number) => {
@@ -51,16 +62,21 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
         return next;
       });
 
-      const rowId = initialData.criteria[rowIdx].id;
-      const colId = initialData.criteria[colIdx].id;
-      const timerKey = `${rowId}:${colId}`;
+      const rowId = suppliers[rowIdx].id;
+      const colId = suppliers[colIdx].id;
+      const timerKey = `${selectedCriteriaId}:${rowId}:${colId}`;
 
       const existing = debounceTimers.current.get(timerKey);
       if (existing) clearTimeout(existing);
 
       const timer = setTimeout(async () => {
         setLoading(true);
-        const result = await saveCriteriaCell(rowId, colId, newValue);
+        const result = await saveSupplierCell(
+          selectedCriteriaId,
+          rowId,
+          colId,
+          newValue,
+        );
         setLoading(false);
 
         if (result.success) {
@@ -72,7 +88,7 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
 
       debounceTimers.current.set(timerKey, timer);
     },
-    [initialData.criteria],
+    [suppliers, selectedCriteriaId],
   );
 
   useEffect(() => {
@@ -85,26 +101,46 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
     };
   }, []);
 
-  const n = initialData.criteria.length;
+  const handleCriteriaSelect = useCallback(
+    (criteriaId: string) => {
+      onCriteriaChange(criteriaId);
+    },
+    [onCriteriaChange],
+  );
+
+  const n = suppliers.length;
 
   if (n < 2) {
     return (
-      <div className="flex items-center gap-2 rounded-lg bg-blue-50 p-4 text-sm text-blue-700">
-        <Info className="h-5 w-5 shrink-0" />
-        <span>
-          Minimal 2 kriteria utama diperlukan untuk melakukan perbandingan
-          berpasangan.
-        </span>
+      <div className="space-y-4">
+        <CriteriaNavigator
+          criteria={allCriteria}
+          selectedId={selectedCriteriaId}
+          onSelect={handleCriteriaSelect}
+        />
+        <div className="flex items-center gap-2 rounded-lg bg-blue-50 p-4 text-sm text-blue-700">
+          <Info className="h-5 w-5 shrink-0" />
+          <span>
+            Minimal 2 pemasok diperlukan untuk melakukan perbandingan
+            berpasangan.
+          </span>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
+      <CriteriaNavigator
+        criteria={allCriteria}
+        selectedId={selectedCriteriaId}
+        onSelect={handleCriteriaSelect}
+      />
+
       <div className="flex items-center gap-2">
         <p className="text-sm text-gray-500">
-          Isi perbandingan berpasangan antar kriteria menggunakan skala Saaty
-          1–9. Hanya sel di atas diagonal yang dapat diedit.
+          Isi perbandingan berpasangan antar pemasok untuk kriteria{" "}
+          <span className="font-semibold text-teal-700">{criteriaName}</span>.
         </p>
         {loading && (
           <div className="flex items-center gap-1 text-sm text-teal-600">
@@ -119,23 +155,23 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
           <thead>
             <tr>
               <th className="sticky left-0 z-10 border-b border-r bg-teal-50 px-3 py-2 text-left font-semibold text-teal-800">
-                Kriteria
+                Pemasok
               </th>
-              {initialData.criteria.map((c) => (
+              {suppliers.map((s) => (
                 <th
-                  key={c.id}
+                  key={s.id}
                   className="border-b bg-teal-50 px-3 py-2 text-center font-semibold text-teal-800"
                 >
-                  {c.name}
+                  {s.name}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {matrix.map((row, i) => (
-              <tr key={initialData.criteria[i].id}>
+              <tr key={suppliers[i].id}>
                 <td className="sticky left-0 z-10 border-b border-r bg-white px-3 py-2 font-medium text-gray-700">
-                  {initialData.criteria[i].name}
+                  {suppliers[i].name}
                 </td>
                 {row.map((cell, j) => (
                   <td

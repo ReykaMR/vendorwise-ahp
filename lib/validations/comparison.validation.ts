@@ -15,6 +15,8 @@ export const comparisonValueSchema = z
     { message: "Nilai harus berupa skala Saaty (1/9 – 9)" },
   );
 
+// ---- Criteria Comparison Schemas ----
+
 export const saveComparisonSchema = z.object({
   criteria1Id: z.string().min(1, "ID kriteria 1 wajib diisi"),
   criteria2Id: z.string().min(1, "ID kriteria 2 wajib diisi"),
@@ -31,5 +33,17 @@ export const saveAllComparisonsSchema = z.object({
   ),
 });
 
+// ---- Supplier Comparison Schemas ----
+
+export const saveSupplierComparisonSchema = z.object({
+  criteriaId: z.string().min(1, "ID kriteria wajib diisi"),
+  supplier1Id: z.string().min(1, "ID pemasok 1 wajib diisi"),
+  supplier2Id: z.string().min(1, "ID pemasok 2 wajib diisi"),
+  value: comparisonValueSchema,
+});
+
 export type SaveComparisonInput = z.infer<typeof saveComparisonSchema>;
 export type SaveAllComparisonsInput = z.infer<typeof saveAllComparisonsSchema>;
+export type SaveSupplierComparisonInput = z.infer<
+  typeof saveSupplierComparisonSchema
+>;

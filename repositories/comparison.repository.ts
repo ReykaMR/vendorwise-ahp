@@ -1,14 +1,21 @@
 import prisma from "@/lib/prisma";
-import type { CriteriaComparison } from "@/app/generated/prisma/client";
+import type {
+  CriteriaComparison,
+  SupplierComparison,
+} from "@/app/generated/prisma/client";
 
 export const comparisonRepository = {
-  async findByUser(userId: string): Promise<CriteriaComparison[]> {
+  // ---- Criteria Comparison ----
+
+  async findCriteriaByUser(
+    userId: string,
+  ): Promise<CriteriaComparison[]> {
     return prisma.criteriaComparison.findMany({
       where: { userId },
     });
   },
 
-  async upsert(
+  async upsertCriteria(
     userId: string,
     criteria1Id: string,
     criteria2Id: string,
@@ -34,9 +41,59 @@ export const comparisonRepository = {
     });
   },
 
-  async deleteManyForUser(userId: string): Promise<number> {
+  async deleteCriteriaByUser(userId: string): Promise<number> {
     const result = await prisma.criteriaComparison.deleteMany({
       where: { userId },
+    });
+    return result.count;
+  },
+
+  // ---- Supplier Comparison ----
+
+  async findSupplierByUserAndCriteria(
+    userId: string,
+    criteriaId: string,
+  ): Promise<SupplierComparison[]> {
+    return prisma.supplierComparison.findMany({
+      where: { userId, criteriaId },
+    });
+  },
+
+  async upsertSupplier(
+    userId: string,
+    criteriaId: string,
+    supplier1Id: string,
+    supplier2Id: string,
+    value: number,
+  ): Promise<SupplierComparison> {
+    return prisma.supplierComparison.upsert({
+      where: {
+        userId_criteriaId_supplier1Id_supplier2Id: {
+          userId,
+          criteriaId,
+          supplier1Id,
+          supplier2Id,
+        },
+      },
+      create: {
+        userId,
+        criteriaId,
+        supplier1Id,
+        supplier2Id,
+        value,
+      },
+      update: {
+        value,
+      },
+    });
+  },
+
+  async deleteSupplierByUserAndCriteria(
+    userId: string,
+    criteriaId: string,
+  ): Promise<number> {
+    const result = await prisma.supplierComparison.deleteMany({
+      where: { userId, criteriaId },
     });
     return result.count;
   },
