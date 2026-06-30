@@ -5,6 +5,7 @@ import { MatrixCell } from "@/components/comparison/MatrixCell";
 import { saveCriteriaCell } from "@/app/actions/comparison.actions";
 import { Loader2, Info } from "lucide-react";
 import { toast } from "sonner";
+import { ComparisonProgress } from "@/components/comparison/ComparisonProgress";
 
 type CriteriaItem = {
   id: string;
@@ -86,6 +87,10 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
   }, []);
 
   const n = initialData.criteria.length;
+  const totalPairs = (n * (n - 1)) / 2;
+  const filledPairs = matrix
+    .flatMap((row) => row.filter((cell) => !cell.isReadonly))
+    .filter((cell) => cell.value !== null).length;
 
   if (n < 2) {
     return (
@@ -113,6 +118,8 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
           </div>
         )}
       </div>
+
+      <ComparisonProgress totalPairs={totalPairs} filledPairs={filledPairs} />
 
       <div className="overflow-x-auto rounded-lg border border-gray-200">
         <table className="w-full min-w-[400px] border-collapse text-sm">
