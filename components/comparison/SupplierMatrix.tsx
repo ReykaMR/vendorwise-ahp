@@ -6,6 +6,7 @@ import { saveSupplierCell } from "@/app/actions/comparison.actions";
 import { Loader2, Info } from "lucide-react";
 import { toast } from "sonner";
 import { CriteriaNavigator } from "@/components/comparison/CriteriaNavigator";
+import { ComparisonProgress } from "@/components/comparison/ComparisonProgress";
 
 type SupplierItem = {
   id: string;
@@ -109,6 +110,10 @@ export function SupplierMatrix({
   );
 
   const n = suppliers.length;
+  const totalPairs = (n * (n - 1)) / 2;
+  const filledPairs = matrix
+    .flatMap((row) => row.filter((cell) => !cell.isReadonly))
+    .filter((cell) => cell.value !== null).length;
 
   if (n < 2) {
     return (
@@ -149,6 +154,8 @@ export function SupplierMatrix({
           </div>
         )}
       </div>
+
+      <ComparisonProgress totalPairs={totalPairs} filledPairs={filledPairs} />
 
       <div className="overflow-x-auto rounded-lg border border-gray-200">
         <table className="w-full min-w-[400px] border-collapse text-sm">
