@@ -7,6 +7,7 @@ import { ConsistencyAlert } from "@/components/results/ConsistencyAlert";
 import { CriteriaWeightChart } from "@/components/results/CriteriaWeightChart";
 import { SupplierScoreChart } from "@/components/results/SupplierScoreChart";
 import { ResultTable } from "@/components/results/ResultTable";
+import { ExportButtons } from "@/components/results/ExportButtons";
 import { Button } from "@/components/ui/button";
 import { Loader2, Calculator, AlertCircle } from "lucide-react";
 
@@ -45,23 +46,26 @@ export function ResultsClient({
             Peringkat pemasok berdasarkan perhitungan Analytic Hierarchy Process
           </p>
         </div>
-        <Button
-          onClick={handleCalculate}
-          disabled={calculating}
-          className="bg-orange-500 hover:bg-orange-600 text-white"
-        >
-          {calculating ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Menghitung...
-            </>
-          ) : (
-            <>
-              <Calculator className="mr-2 h-4 w-4" />
-              Hitung AHP
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          {result && <ExportButtons result={result} />}
+          <Button
+            onClick={handleCalculate}
+            disabled={calculating}
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+          >
+            {calculating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Menghitung...
+              </>
+            ) : (
+              <>
+                <Calculator className="mr-2 h-4 w-4" />
+                Hitung AHP
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {error && (
