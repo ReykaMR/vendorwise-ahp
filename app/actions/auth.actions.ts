@@ -1,8 +1,7 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations/auth.validation";
-import { hashPassword } from "@/lib/utils/password";
+import { userService } from "@/services/user.service";
 import { Prisma } from "@/app/generated/prisma/client";
 
 export type RegisterState = {
@@ -36,15 +35,11 @@ export async function registerUser(
   const { name, email, password } = validated.data;
 
   try {
-    const hashedPassword = await hashPassword(password);
-
-    await prisma.user.create({
-      data: {
-        name,
-        email: email.toLowerCase(),
-        password: hashedPassword,
-        role: "USER", // default
-      },
+    await userService.create({
+      name,
+      email,
+      password,
+      role: "USER",
     });
 
     return { success: true };

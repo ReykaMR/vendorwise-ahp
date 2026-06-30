@@ -14,13 +14,13 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User, Settings } from "lucide-react";
 
-interface UserNavProps {
+type UserNavProps = {
   user: {
     name?: string | null;
     email?: string | null;
     image?: string | null;
   };
-}
+};
 
 export function UserNav({ user }: UserNavProps) {
   const router = useRouter();

@@ -2,7 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
-import { verifyPassword } from "@/lib/utils/password";
+import { userService } from "@/services/user.service";
 import { loginSchema } from "@/lib/validations/auth.validation";
 
 export const authOptions: NextAuthOptions = {
@@ -26,25 +26,13 @@ export const authOptions: NextAuthOptions = {
 
         const { email, password } = validated.data;
 
-        const user = await prisma.user.findUnique({
-          where: { email: email.toLowerCase() },
-        });
+        const user = await userService.verifyCredentials(email, password);
 
         if (!user) {
           throw new Error("Email atau password salah");
         }
 
-        const isValid = await verifyPassword(password, user.password);
-        if (!isValid) {
-          throw new Error("Email atau password salah");
-        }
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
+        return user;
       },
     }),
   ],

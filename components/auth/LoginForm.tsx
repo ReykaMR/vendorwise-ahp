@@ -64,7 +64,7 @@ export function LoginForm() {
           router.push(callbackUrl);
           router.refresh();
         }
-      } catch (err) {
+      } catch {
         setError("Terjadi kesalahan, silakan coba lagi");
       }
     });
@@ -94,12 +94,15 @@ export function LoginForm() {
         )}
 
         {error && (
-            <Alert variant="destructive" className="bg-red-50 border-red-200 mb-4">
-              <AlertDescription className="text-red-800">
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
+          <Alert
+            variant="destructive"
+            className="bg-red-50 border-red-200 mb-4"
+          >
+            <AlertDescription className="text-red-800">
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FieldGroup>
@@ -142,7 +145,7 @@ export function LoginForm() {
                 <FieldError>{errors.password.message}</FieldError>
               )}
             </Field>
-          </FieldGroup>       
+          </FieldGroup>
 
           <Button
             type="submit"

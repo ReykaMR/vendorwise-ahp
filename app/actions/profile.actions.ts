@@ -2,9 +2,8 @@
 
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth/auth";
-import { hashPassword, verifyPassword } from "@/lib/utils/password";
+import { userService } from "@/services/user.service";
 import {
   updateProfileSchema,
   changePasswordSchema,
@@ -52,13 +51,7 @@ export async function updateProfile(
   const { name, email } = validated.data;
 
   try {
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: {
-        name,
-        email: email.toLowerCase(),
-      },
-    });
+    await userService.update(session.user.id, { name, email });
 
     revalidatePath("/profile");
     return { success: true };
@@ -103,32 +96,20 @@ export async function changePassword(
   const { currentPassword, newPassword } = validated.data;
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { password: true },
-    });
-
-    if (!user) {
-      return { errors: { _form: ["Pengguna tidak ditemukan"] } };
-    }
-
-    const isValid = await verifyPassword(currentPassword, user.password);
-    if (!isValid) {
+    const success = await userService.changePassword(
+      session.user.id,
+      currentPassword,
+      newPassword,
+    );
+    if (!success) {
       return {
         errors: {
           currentPassword: ["Password saat ini salah"],
         },
       };
     }
-
-    const hashedPassword = await hashPassword(newPassword);
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { password: hashedPassword },
-    });
-
     return { success: true };
-  } catch (error) {
+  } catch {
     return {
       errors: {
         _form: ["Terjadi kesalahan server. Silakan coba lagi."],
