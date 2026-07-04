@@ -55,9 +55,9 @@ export default async function HomePage() {
       <main className="flex-1">
         <section className="max-w-6xl mx-auto px-4 py-20 md:py-32 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-teal-900 leading-tight">
-            Sistem Pendukung Keputusan
+            Sistem Pemilihan Pemasok Bahan Baku
             <br />
-            <span className="text-orange-500">Pemilihan Pemasok</span>
+            <span className="text-orange-500">Dengan Metode AHP</span>
           </h1>
           <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             VendorWise AHP membantu Anda memilih pemasok bahan baku terbaik
@@ -200,8 +200,8 @@ export default async function HomePage() {
 
       <footer className="border-t border-teal-100 bg-white py-6">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} VendorWise AHP. Sistem Pendukung
-          Keputusan berbasis Analytic Hierarchy Process.
+          &copy; {new Date().getFullYear()} VendorWise AHP. Sistem Pemilihan
+          Pemasok Bahan Baku dengan Metode Analytic Hierarchy Process.
         </div>
       </footer>
     </div>

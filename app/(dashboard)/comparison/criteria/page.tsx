@@ -7,7 +7,7 @@ import { CriteriaMatrix } from "@/components/comparison/CriteriaMatrix";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Perbandingan Kriteria — VendorWise AHP",
+  title: "Perbandingan Kriteria - VendorWise AHP",
   description:
     "Lakukan perbandingan berpasangan antar kriteria menggunakan skala Saaty 1–9.",
 };

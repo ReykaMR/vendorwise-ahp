@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MatrixCell } from "@/components/comparison/MatrixCell";
 import { saveCriteriaCell } from "@/app/actions/comparison.actions";
-import { Loader2, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { toast } from "sonner";
 import { ComparisonProgress } from "@/components/comparison/ComparisonProgress";
+import { ConsistencyBadge } from "@/components/comparison/ConsistencyBadge";
+import { SaveIndicator } from "@/components/comparison/SaveIndicator";
 
 type CriteriaItem = {
   id: string;
@@ -28,12 +30,53 @@ type CriteriaMatrixProps = {
   initialData: CriteriaMatrixData;
 };
 
+function findExtremes(
+  cells: MatrixCellData[][],
+): { minVal: number; maxVal: number } | null {
+  let minVal = Infinity;
+  let maxVal = -Infinity;
+  let found = false;
+  for (const row of cells) {
+    for (const c of row) {
+      if (!c.isReadonly && c.value !== null) {
+        if (c.value < minVal) minVal = c.value;
+        if (c.value > maxVal) maxVal = c.value;
+        found = true;
+      }
+    }
+  }
+  return found ? { minVal, maxVal } : null;
+}
+
+function isBest(
+  cell: MatrixCellData,
+  extremes: { minVal: number; maxVal: number } | null,
+): boolean {
+  if (!extremes || cell.value === null || cell.isReadonly) return false;
+  return Math.abs(cell.value - extremes.maxVal) < 1e-10;
+}
+
+function isWorst(
+  cell: MatrixCellData,
+  extremes: { minVal: number; maxVal: number } | null,
+): boolean {
+  if (!extremes || cell.value === null || cell.isReadonly) return false;
+  return (
+    Math.abs(cell.value - extremes.minVal) < 1e-10 &&
+    Math.abs(extremes.minVal - extremes.maxVal) > 1e-10
+  );
+}
+
 export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
   const [matrix, setMatrix] = useState<MatrixCellData[][]>(initialData.cells);
   const [loading, setLoading] = useState(false);
+  const [saveVersion, setSaveVersion] = useState(0);
   const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(
     new Map(),
   );
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  const extremes = findExtremes(matrix);
 
   const handleChange = useCallback(
     (rowIdx: number, colIdx: number, newValue: number) => {
@@ -62,6 +105,7 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
         setLoading(false);
 
         if (result.success) {
+          setSaveVersion((v) => v + 1);
           toast.success("Tersimpan");
         } else {
           toast.error(result.error || "Gagal menyimpan");
@@ -81,6 +125,15 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
       }
       timers.clear();
     };
+  }, []);
+
+  useEffect(() => {
+    const wrapper = tableRef.current;
+    if (!wrapper) return;
+    const firstEditable = wrapper.querySelector<HTMLButtonElement>(
+      'td:not(.readonly-cell) button[data-slot="select-trigger"]',
+    );
+    firstEditable?.focus({ preventScroll: true });
   }, []);
 
   const n = initialData.criteria.length;
@@ -108,17 +161,33 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
           Isi perbandingan berpasangan antar kriteria menggunakan skala Saaty
           1–9. Hanya sel di atas diagonal yang dapat diedit.
         </p>
-        {loading && (
-          <div className="flex items-center gap-1 text-sm text-teal-600">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Menyimpan...
-          </div>
-        )}
+        <SaveIndicator saving={loading} saveVersion={saveVersion} />
       </div>
 
       <ComparisonProgress totalPairs={totalPairs} filledPairs={filledPairs} />
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <ConsistencyBadge type="criteria" saveVersion={saveVersion} />
+
+      <p className="text-xs text-gray-400">
+        Gunakan{" "}
+        <kbd className="rounded border bg-gray-100 px-1 font-mono text-xs">
+          Tab
+        </kbd>{" "}
+        untuk navigasi antar sel.
+        {extremes && (
+          <span className="ml-2">
+            <span className="inline-block h-2 w-2 rounded-sm bg-green-200 align-middle" />{" "}
+            nilai tertinggi &middot;{" "}
+            <span className="inline-block h-2 w-2 rounded-sm bg-red-200 align-middle" />{" "}
+            nilai terendah
+          </span>
+        )}
+      </p>
+
+      <div
+        className="overflow-x-auto rounded-lg border border-gray-200"
+        ref={tableRef}
+      >
         <table className="w-full min-w-100 border-collapse text-sm">
           <thead>
             <tr>
@@ -141,20 +210,31 @@ export function CriteriaMatrix({ initialData }: CriteriaMatrixProps) {
                 <td className="sticky left-0 z-10 border-b border-r bg-white px-3 py-2 font-medium text-gray-700">
                   {initialData.criteria[i].name}
                 </td>
-                {row.map((cell, j) => (
-                  <td
-                    key={`${cell.rowId}-${cell.colId}`}
-                    className={`border-b px-1 py-1 text-center ${
-                      !cell.isReadonly ? "bg-white" : "bg-gray-50/50"
-                    }`}
-                  >
-                    <MatrixCell
-                      value={cell.value}
-                      isReadonly={cell.isReadonly}
-                      onChange={(newVal) => handleChange(i, j, newVal)}
-                    />
-                  </td>
-                ))}
+                {row.map((cell, j) => {
+                  let highlightClass = "";
+                  if (!cell.isReadonly) {
+                    if (isBest(cell, extremes)) highlightClass = "bg-green-50";
+                    else if (isWorst(cell, extremes))
+                      highlightClass = "bg-red-50";
+                  }
+
+                  return (
+                    <td
+                      key={`${cell.rowId}-${cell.colId}`}
+                      className={`border-b px-1 py-1 text-center ${
+                        cell.isReadonly
+                          ? "bg-gray-50/50 readonly-cell"
+                          : highlightClass || "bg-white"
+                      }`}
+                    >
+                      <MatrixCell
+                        value={cell.value}
+                        isReadonly={cell.isReadonly}
+                        onChange={(newVal) => handleChange(i, j, newVal)}
+                      />
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

@@ -2,8 +2,10 @@
 
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { useUnsavedChanges } from "@/lib/hooks/useUnsavedChanges";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   userCreateSchema,
   userUpdateSchema,
@@ -20,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, User, Mail, Lock } from "lucide-react";
+import { Loader2, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 type FormValues = {
   name: string;
@@ -46,6 +48,7 @@ export function UserForm({
   const action =
     mode === "create" ? createUser : updateUser.bind(null, userId!);
   const [state, formAction, isPending] = useActionState(action, null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const schema = mode === "create" ? userCreateSchema : userUpdateSchema;
 
@@ -64,15 +67,22 @@ export function UserForm({
     defaultValues: getDefaultValues(),
   });
 
+  useUnsavedChanges(form.formState.isDirty);
+
   // Type guard untuk cek apakah field password ada
   const isCreateMode = mode === "create";
 
   useEffect(() => {
     if (state?.success) {
+      toast.success(
+        mode === "create"
+          ? "Pengguna berhasil ditambahkan"
+          : "Pengguna berhasil diubah",
+      );
       if (onSuccess) onSuccess();
       else router.push("/admin/users");
     }
-  }, [state?.success, router, onSuccess]);
+  }, [state?.success, router, onSuccess, mode]);
 
   useEffect(() => {
     if (state?.errors) {
@@ -139,11 +149,23 @@ export function UserForm({
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-500" />
             <Input
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
-              className="pl-9 border-teal-200 focus-visible:ring-teal-500"
+              className="pl-9 pr-10 border-teal-200 focus-visible:ring-teal-500"
               {...form.register("password" as keyof FormValues)}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-500 hover:text-teal-700"
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
           </div>
           {"password" in form.formState.errors &&
             form.formState.errors.password && (
@@ -196,7 +218,7 @@ export function UserForm({
           className="bg-orange-500 hover:bg-orange-600 text-white"
           disabled={isPending}
         >
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           {mode === "create" ? "Tambah" : "Simpan"}
         </Button>
       </div>

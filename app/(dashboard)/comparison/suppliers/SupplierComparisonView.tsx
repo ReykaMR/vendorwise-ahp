@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { SupplierMatrix } from "@/components/comparison/SupplierMatrix";
 import { getSupplierMatrix } from "@/app/actions/comparison.actions";
-import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type SupplierMatrixData = {
   criteriaId: string;
@@ -59,20 +59,54 @@ export function SupplierComparisonView({
 
   return (
     <div className="relative">
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-white/60">
-          <div className="flex items-center gap-2 text-teal-600">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span className="text-sm font-medium">Memuat data...</span>
+      {isLoading ? (
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            {allCriteria.map((c) => (
+              <Skeleton key={c.id} className="h-9 w-28 rounded-md" />
+            ))}
+          </div>
+          <Skeleton className="h-5 w-72" />
+          <Skeleton className="h-5 w-56" />
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <table className="w-full min-w-100 border-collapse text-sm">
+              <thead>
+                <tr>
+                  <th className="border-b border-r bg-gray-100 px-3 py-3">
+                    <Skeleton className="h-4 w-16" />
+                  </th>
+                  {[1, 2, 3].map((i) => (
+                    <th key={i} className="border-b bg-gray-100 px-3 py-3">
+                      <Skeleton className="mx-auto h-4 w-20" />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[1, 2, 3].map((row) => (
+                  <tr key={row}>
+                    <td className="border-b border-r bg-white px-3 py-3">
+                      <Skeleton className="h-4 w-24" />
+                    </td>
+                    {[1, 2, 3].map((col) => (
+                      <td key={col} className="border-b bg-white px-3 py-3">
+                        <Skeleton className="mx-auto h-8 w-16 rounded" />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
+      ) : (
+        <SupplierMatrix
+          key={matrixData.criteriaId}
+          allCriteria={allCriteria}
+          initialData={matrixData}
+          onCriteriaChange={handleCriteriaChange}
+        />
       )}
-      <SupplierMatrix
-        key={matrixData.criteriaId}
-        allCriteria={allCriteria}
-        initialData={matrixData}
-        onCriteriaChange={handleCriteriaChange}
-      />
     </div>
   );
 }

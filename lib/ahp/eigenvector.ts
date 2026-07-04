@@ -5,7 +5,7 @@ import {
   buildPairwiseMatrix,
 } from "./matrix";
 
-export function calculateEigenvector(matrix: number[][]): number[] {
+function calculateEigenvector(matrix: number[][]): number[] {
   const normalized = normalizeColumns(matrix);
   const n = normalized.length;
   const eigenvector: number[] = [];

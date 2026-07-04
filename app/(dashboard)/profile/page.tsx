@@ -7,7 +7,7 @@ import { ChangePasswordForm } from "@/components/profile/ChangePasswordForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Profil — VendorWise AHP",
+  title: "Profil - VendorWise AHP",
   description: "Pengaturan profil pengguna VendorWise AHP.",
 };
 

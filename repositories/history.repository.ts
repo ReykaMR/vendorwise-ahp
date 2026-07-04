@@ -33,9 +33,22 @@ export const historyRepository = {
     });
   },
 
+  async deleteMany(ids: string[], userId: string) {
+    return prisma.calculationHistory.deleteMany({
+      where: { id: { in: ids }, userId },
+    });
+  },
+
   async delete(id: string, userId: string) {
     return prisma.calculationHistory.deleteMany({
       where: { id, userId },
+    });
+  },
+
+  async updateLabel(id: string, userId: string, label: string) {
+    return prisma.calculationHistory.updateMany({
+      where: { id, userId },
+      data: { label },
     });
   },
 };

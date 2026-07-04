@@ -43,7 +43,7 @@ model User {
 
 // ------------------------------------------------------------
 // Model: Account
-// Akun OAuth / credentials — dibutuhkan oleh NextAuth PrismaAdapter
+// Akun OAuth / credentials - dibutuhkan oleh NextAuth PrismaAdapter
 // ------------------------------------------------------------
 model Account {
   id                String  @id @default(cuid())
@@ -67,7 +67,7 @@ model Account {
 
 // ------------------------------------------------------------
 // Model: Session
-// Sesi database — dibutuhkan oleh NextAuth PrismaAdapter
+// Sesi database - dibutuhkan oleh NextAuth PrismaAdapter
 // ------------------------------------------------------------
 model Session {
   id           String   @id @default(cuid())
@@ -81,7 +81,7 @@ model Session {
 
 // ------------------------------------------------------------
 // Model: VerificationToken
-// Token verifikasi — dibutuhkan oleh NextAuth PrismaAdapter
+// Token verifikasi - dibutuhkan oleh NextAuth PrismaAdapter
 // ------------------------------------------------------------
 model VerificationToken {
   identifier String
@@ -90,6 +90,22 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// ------------------------------------------------------------
+// Model: PasswordResetToken
+// Token untuk reset password (self-service lupa password)
+// ------------------------------------------------------------
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  email     String
+  token     String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+
+  @@index([email])
+  @@map("password_reset_tokens")
 }
 
 enum Role {
@@ -255,7 +271,7 @@ model SupplierPriority {
 
 // ------------------------------------------------------------
 // Model: CalculationHistory
-// Riwayat hasil perhitungan AHP — menyimpan snapshot JSON dari
+// Riwayat hasil perhitungan AHP - menyimpan snapshot JSON dari
 // seluruh hasil perhitungan untuk keperluan histori dan komparasi
 // ------------------------------------------------------------
 model CalculationHistory {

@@ -8,6 +8,10 @@ import {
   saveComparisonSchema,
   saveSupplierComparisonSchema,
 } from "@/lib/validations/comparison.validation";
+import { criteriaRepository } from "@/repositories/criteria.repository";
+import { supplierRepository } from "@/repositories/supplier.repository";
+import { comparisonRepository } from "@/repositories/comparison.repository";
+import { calculatePriorities } from "@/lib/ahp/priority";
 
 async function requireAuth() {
   const session = await getServerSession(authOptions);
@@ -16,19 +20,6 @@ async function requireAuth() {
 }
 
 // ---- Criteria Matrix ----
-
-export async function getCriteriaMatrix() {
-  try {
-    const user = await requireAuth();
-    const matrix = await comparisonService.getMatrix(user.id);
-    return { success: true, data: matrix };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Gagal memuat matriks",
-    };
-  }
-}
 
 export type SaveCellState = {
   success?: boolean;
@@ -119,5 +110,87 @@ export async function saveSupplierCell(
     return {
       error: error instanceof Error ? error.message : "Gagal menyimpan",
     };
+  }
+}
+
+// ---- Consistency Check ----
+
+export async function checkCriteriaConsistency() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return { canCompute: false, missing: 0, total: 0 };
+
+    const criteria = await criteriaRepository.findRoots();
+    if (criteria.length < 2) return { canCompute: false, missing: 0, total: 0 };
+
+    const comparisons = await comparisonRepository.findCriteriaByUser(
+      session.user.id,
+    );
+
+    const totalPairs = (criteria.length * (criteria.length - 1)) / 2;
+    const missing = totalPairs - comparisons.length;
+
+    if (missing > 0) return { canCompute: false, missing, total: totalPairs };
+
+    const result = calculatePriorities(
+      criteria.map((c) => ({ id: c.id, name: c.name })),
+      comparisons.map((c) => ({
+        entity1Id: c.criteria1Id,
+        entity2Id: c.criteria2Id,
+        value: c.value,
+      })),
+    );
+
+    return {
+      canCompute: true,
+      cr: result.consistency.cr,
+      isConsistent: result.consistency.isConsistent,
+      missing: 0,
+      total: totalPairs,
+    };
+  } catch {
+    return { canCompute: false, missing: 0, total: 0 };
+  }
+}
+
+export async function checkSupplierConsistency(criteriaId?: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return { canCompute: false, missing: 0, total: 0 };
+    if (!criteriaId) return { canCompute: false, missing: 0, total: 0 };
+
+    const suppliers = await supplierRepository.findMany();
+    if (suppliers.length < 2)
+      return { canCompute: false, missing: 0, total: 0 };
+
+    const comparisons =
+      await comparisonRepository.findSupplierByUserAndCriteria(
+        session.user.id,
+        criteriaId,
+      );
+
+    const totalPairs = (suppliers.length * (suppliers.length - 1)) / 2;
+    const missing = totalPairs - comparisons.length;
+
+    if (missing > 0) return { canCompute: false, missing, total: totalPairs };
+
+    const result = calculatePriorities(
+      suppliers.map((s) => ({ id: s.id, name: s.name })),
+      comparisons.map((c) => ({
+        entity1Id: c.supplier1Id,
+        entity2Id: c.supplier2Id,
+        value: c.value,
+      })),
+    );
+
+    return {
+      canCompute: true,
+      cr: result.consistency.cr,
+      isConsistent: result.consistency.isConsistent,
+      missing: 0,
+      total: totalPairs,
+    };
+  } catch {
+    return { canCompute: false, missing: 0, total: 0 };
   }
 }

@@ -6,9 +6,9 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Masuk — VendorWise AHP",
+  title: "Masuk - VendorWise AHP",
   description:
-    "Halaman masuk untuk mengakses Sistem Pendukung Keputusan VendorWise AHP.",
+    "Halaman masuk untuk mengakses Sistem Pemilihan Pemasok Bahan Baku VendorWise AHP.",
 };
 
 export default async function LoginPage() {

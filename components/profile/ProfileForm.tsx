@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useActionState, useEffect } from "react";
+import { useUnsavedChanges } from "@/lib/hooks/useUnsavedChanges";
 import {
   UpdateProfileInput,
   updateProfileSchema,
@@ -25,7 +26,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, User, Mail, CheckCircle2 } from "lucide-react";
+import { Loader2, User, Mail } from "lucide-react";
+import { toast } from "sonner";
 
 type ProfileFormProps = {
   defaultValues: {
@@ -40,12 +42,14 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
   const {
     register,
     setError,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm<UpdateProfileInput>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues,
   });
+
+  useUnsavedChanges(isDirty);
 
   // Sinkronkan error dari server action ke form
   useEffect(() => {
@@ -61,9 +65,9 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
     }
   }, [state, setError]);
 
-  // Reset form jika sukses (opsional, biasanya biarkan nilai baru)
   useEffect(() => {
     if (state?.success) {
+      toast.success("Profil berhasil diperbarui");
       reset(defaultValues);
     }
   }, [state?.success, reset, defaultValues]);
@@ -80,15 +84,6 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
-          {state?.success && (
-            <Alert className="bg-green-50 border-green-200">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
-                Profil berhasil diperbarui.
-              </AlertDescription>
-            </Alert>
-          )}
-
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name" className="text-teal-800">
@@ -143,7 +138,7 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
           >
             {isPending ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Menyimpan...
               </>
             ) : (

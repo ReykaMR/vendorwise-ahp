@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Database } from "lucide-react";
 import Link from "next/link";
 import { ConsistencyAlert } from "@/components/results/ConsistencyAlert";
 import { CriteriaWeightChart } from "@/components/results/CriteriaWeightChart";
@@ -88,6 +88,17 @@ export function HistoryDetailClient({
         </div>
       )}
 
+      {!criteriaResult &&
+        ranking.length === 0 &&
+        supplierResults.length === 0 && (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 py-12">
+            <Database className="h-10 w-10 text-gray-300" />
+            <p className="mt-3 text-sm text-gray-500">
+              Data perhitungan tidak tersedia atau telah dihapus.
+            </p>
+          </div>
+        )}
+
       {criteriaResult && (
         <ConsistencyAlert
           cr={criteriaResult.consistency.cr}
@@ -141,7 +152,7 @@ export function HistoryDetailClient({
         <Card key={sr.criteriaId}>
           <CardHeader>
             <CardTitle className="text-base text-teal-800">
-              Bobot Prioritas Pemasok — {sr.criteriaName}
+              Bobot Prioritas Pemasok - {sr.criteriaName}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -150,8 +161,8 @@ export function HistoryDetailClient({
               isConsistent={sr.consistency.isConsistent}
               label={sr.criteriaName}
             />
-            <div className="mt-3 overflow-x-auto">
-              <table className="w-full min-w-75 border-collapse text-sm">
+            <div className="mt-3 overflow-x-auto -mx-2 sm:mx-0">
+              <table className="w-full min-w-0 border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <th className="px-3 py-2">No</th>
@@ -160,18 +171,20 @@ export function HistoryDetailClient({
                   </tr>
                 </thead>
                 <tbody>
-                  {sr.items
+                  {[...sr.items]
                     .sort((a, b) => b.priority - a.priority)
                     .map((item, idx) => (
                       <tr
                         key={item.id}
                         className="border-b border-gray-100 hover:bg-gray-50"
                       >
-                        <td className="px-3 py-2 text-gray-500">{idx + 1}</td>
-                        <td className="px-3 py-2 font-medium text-gray-800">
+                        <td className="px-3 py-2 text-gray-500 whitespace-nowrap">
+                          {idx + 1}
+                        </td>
+                        <td className="px-3 py-2 font-medium text-gray-800 whitespace-nowrap">
                           {item.name}
                         </td>
-                        <td className="px-3 py-2 text-gray-600">
+                        <td className="px-3 py-2 text-gray-600 whitespace-nowrap">
                           {(item.priority * 100).toFixed(2)}%
                         </td>
                       </tr>

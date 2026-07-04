@@ -6,7 +6,7 @@ import { ResultsClient } from "./ResultsClient";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Hasil Perhitungan — VendorWise AHP",
+  title: "Hasil Perhitungan - VendorWise AHP",
   description:
     "Lihat hasil perhitungan AHP, bobot kriteria, skor pemasok, dan peringkat akhir.",
 };

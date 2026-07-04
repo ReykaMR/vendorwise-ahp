@@ -3,12 +3,15 @@
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useActionState, useEffect } from "react";
+import { useUnsavedChanges } from "@/lib/hooks/useUnsavedChanges";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   supplierCreateSchema,
   supplierUpdateSchema,
 } from "@/lib/validations/supplier.validation";
 import { createSupplier, updateSupplier } from "@/app/actions/supplier.actions";
+import { checkSupplierName } from "@/app/actions/check-duplicate.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,12 +60,29 @@ export function SupplierForm({
     defaultValues: getDefaultValues(),
   });
 
+  useUnsavedChanges(form.formState.isDirty);
+
+  const handleNameBlur = async () => {
+    const name = form.getValues("name");
+    if (!name || name.length < 2) return;
+
+    const result = await checkSupplierName(name, supplierId);
+    if (result.duplicate) {
+      form.setError("name", { message: result.message });
+    }
+  };
+
   useEffect(() => {
     if (state?.success) {
+      toast.success(
+        mode === "create"
+          ? "Pemasok berhasil ditambahkan"
+          : "Pemasok berhasil diubah",
+      );
       if (onSuccess) onSuccess();
       else router.push("/suppliers");
     }
-  }, [state?.success, router, onSuccess]);
+  }, [state?.success, router, onSuccess, mode]);
 
   useEffect(() => {
     if (state?.errors) {
@@ -86,7 +106,7 @@ export function SupplierForm({
             id="name"
             placeholder="PT. Contoh Abadi"
             className="pl-9 border-teal-200 focus-visible:ring-teal-500"
-            {...form.register("name")}
+            {...form.register("name", { onBlur: handleNameBlur })}
           />
         </div>
         {form.formState.errors.name && (
@@ -193,7 +213,7 @@ export function SupplierForm({
           className="bg-orange-500 hover:bg-orange-600 text-white"
           disabled={isPending}
         >
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           {mode === "create" ? "Tambah" : "Simpan"}
         </Button>
       </div>

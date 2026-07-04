@@ -8,7 +8,7 @@ import { SupplierComparisonView } from "./SupplierComparisonView";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Perbandingan Pemasok — VendorWise AHP",
+  title: "Perbandingan Pemasok - VendorWise AHP",
   description:
     "Lakukan perbandingan berpasangan antar pemasok untuk setiap kriteria.",
 };

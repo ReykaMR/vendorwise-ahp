@@ -83,7 +83,7 @@ export function MatrixCell({ value, isReadonly, onChange }: MatrixCellProps) {
       }}
     >
       <SelectTrigger className="h-10 w-full border-teal-200 bg-white text-sm focus:ring-teal-500">
-        <SelectValue placeholder="—" className="text-gray-400" />
+        <SelectValue placeholder="-" className="text-gray-400" />
       </SelectTrigger>
       <SelectContent>
         {SAATY_VALUES.map((s) => (

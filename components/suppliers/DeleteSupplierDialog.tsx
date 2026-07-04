@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { deleteSupplier } from "@/app/actions/supplier.actions";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type DeleteSupplierDialogProps = {
   open: boolean;
@@ -35,6 +36,7 @@ export function DeleteSupplierDialog({
     setError(null);
     const result = await deleteSupplier(supplier.id);
     if (result.success) {
+      toast.success("Pemasok berhasil dihapus");
       onOpenChange(false);
       router.refresh();
     } else {
@@ -71,9 +73,7 @@ export function DeleteSupplierDialog({
             onClick={handleDelete}
             disabled={isPending}
           >
-            {isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : null}
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Hapus
           </Button>
         </DialogFooter>

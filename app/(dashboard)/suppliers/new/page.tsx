@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default async function NewSupplierPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login");
+  if (session.user.role !== "ADMIN") redirect("/suppliers");
 
   return (
     <div className="max-w-2xl mx-auto">

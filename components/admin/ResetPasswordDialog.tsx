@@ -100,9 +100,7 @@ export function ResetPasswordDialog({
               Batal
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
+              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               Simpan
             </Button>
           </DialogFooter>
