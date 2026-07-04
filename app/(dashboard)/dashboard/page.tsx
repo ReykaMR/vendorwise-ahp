@@ -14,7 +14,7 @@ import { Package, ListTree, Layers, BarChart3 } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard — VendorWise AHP",
+  title: "Dashboard - VendorWise AHP",
   description: "Ringkasan data pemasok dan kriteria VendorWise AHP.",
 };
 

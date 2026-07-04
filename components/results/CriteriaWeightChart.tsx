@@ -37,7 +37,7 @@ export function CriteriaWeightChart({ data }: CriteriaWeightChartProps) {
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <h3 className="mb-4 text-base font-semibold text-teal-800">
+      <h3 className="mb-4 text-base font-semibold text-teal-800 text-center">
         Bobot Prioritas Kriteria
       </h3>
       <ResponsiveContainer
@@ -47,7 +47,8 @@ export function CriteriaWeightChart({ data }: CriteriaWeightChartProps) {
         <BarChart
           data={chartData}
           layout="vertical"
-          margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
+          // margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
+          margin={{ top: 0, right: 50, left: 0, bottom: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis

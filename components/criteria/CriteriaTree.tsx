@@ -24,6 +24,8 @@ import {
   ChevronDown,
   ChevronRight,
   FileText,
+  ListTree,
+  Plus,
 } from "lucide-react";
 import { DeleteCriteriaDialog } from "./DeleteCriteriaDialog";
 import { Prisma } from "@/app/generated/prisma/client";
@@ -35,6 +37,7 @@ type CriteriaNode = Pick<
 
 type CriteriaTreeProps = {
   nodes: CriteriaNode[];
+  role?: "ADMIN" | "USER";
 };
 
 function TreeNode({
@@ -42,11 +45,13 @@ function TreeNode({
   depth,
   onEdit,
   onDelete,
+  isAdmin,
 }: {
   node: CriteriaNode;
   depth: number;
   onEdit: (id: string) => void;
   onDelete: (node: CriteriaNode) => void;
+  isAdmin: boolean;
 }) {
   const [expanded, setExpanded] = useState(true);
   const hasChildren = node.children.length > 0;
@@ -85,26 +90,28 @@ function TreeNode({
         <TableCell className="text-gray-500 text-sm max-w-xs truncate">
           {node.description || "-"}
         </TableCell>
-        <TableCell>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(node.id)}>
-                <Pencil className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-red-600"
-                onClick={() => onDelete(node)}
-              >
-                <Trash className="mr-2 h-4 w-4" /> Hapus
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </TableCell>
+        {isAdmin && (
+          <TableCell>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onEdit(node.id)}>
+                  <Pencil className="h-4 w-4" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={() => onDelete(node)}
+                >
+                  <Trash className="h-4 w-4" /> Hapus
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TableCell>
+        )}
       </TableRow>
       {hasChildren && expanded && (
         <>
@@ -115,6 +122,7 @@ function TreeNode({
               depth={depth + 1}
               onEdit={onEdit}
               onDelete={onDelete}
+              isAdmin={isAdmin}
             />
           ))}
         </>
@@ -123,7 +131,7 @@ function TreeNode({
   );
 }
 
-export function CriteriaTree({ nodes }: CriteriaTreeProps) {
+export function CriteriaTree({ nodes, role = "USER" }: CriteriaTreeProps) {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<CriteriaNode | null>(null);
@@ -137,42 +145,56 @@ export function CriteriaTree({ nodes }: CriteriaTreeProps) {
     setDeleteDialogOpen(true);
   };
 
+  const isAdmin = role === "ADMIN";
+
   return (
     <>
-      <div className="rounded-md border border-teal-100">
-        <Table>
-          <TableHeader className="bg-teal-50">
-            <TableRow>
-              <TableHead className="text-teal-800">Nama</TableHead>
-              <TableHead className="text-teal-800">Level</TableHead>
-              <TableHead className="text-teal-800">Deskripsi</TableHead>
-              <TableHead className="w-16"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {nodes.length === 0 ? (
+      {nodes.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 px-4 py-16">
+          <ListTree className="h-12 w-12 text-gray-300" />
+          <h3 className="mt-4 text-lg font-medium text-gray-500">
+            Belum ada kriteria
+          </h3>
+          <p className="mt-1 text-center text-sm text-gray-400">
+            Tambah kriteria penilaian pertama Anda untuk memulai perbandingan
+            AHP.
+          </p>
+          {isAdmin && (
+            <button
+              onClick={() => router.push("/criteria/new")}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Tambah Kriteria
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="rounded-md border border-teal-100">
+          <Table>
+            <TableHeader className="bg-teal-50">
               <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-center text-gray-500 py-8"
-                >
-                  Belum ada kriteria. Tambah kriteria pertama Anda.
-                </TableCell>
+                <TableHead className="text-teal-800">Nama</TableHead>
+                <TableHead className="text-teal-800">Level</TableHead>
+                <TableHead className="text-teal-800">Deskripsi</TableHead>
+                {isAdmin && <TableHead className="w-16"></TableHead>}
               </TableRow>
-            ) : (
-              nodes.map((node) => (
+            </TableHeader>
+            <TableBody>
+              {nodes.map((node) => (
                 <TreeNode
                   key={node.id}
                   node={node}
                   depth={0}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
+                  isAdmin={isAdmin}
                 />
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       <DeleteCriteriaDialog
         open={deleteDialogOpen}

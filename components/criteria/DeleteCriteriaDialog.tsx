@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { deleteCriteria } from "@/app/actions/criteria.actions";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Prisma } from "@/app/generated/prisma/client";
 
 type CriteriaNode = Pick<Prisma.CriteriaModel, "id" | "name" | "level"> & {
@@ -42,6 +43,7 @@ export function DeleteCriteriaDialog({
     setError(null);
     const result = await deleteCriteria(criteria.id);
     if (result.success) {
+      toast.success("Kriteria berhasil dihapus");
       onOpenChange(false);
       router.refresh();
     } else {
@@ -88,9 +90,7 @@ export function DeleteCriteriaDialog({
             onClick={handleDelete}
             disabled={isPending}
           >
-            {isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : null}
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Hapus
           </Button>
         </DialogFooter>

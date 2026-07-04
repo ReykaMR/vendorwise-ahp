@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { deleteUser } from "@/app/actions/admin.actions";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type DeleteUserDialogProps = {
   open: boolean;
@@ -35,6 +36,7 @@ export function DeleteUserDialog({
     setError(null);
     const result = await deleteUser(user.id);
     if (result.success) {
+      toast.success("Pengguna berhasil dihapus");
       onOpenChange(false);
       router.refresh();
     } else {
@@ -67,9 +69,7 @@ export function DeleteUserDialog({
             onClick={handleDelete}
             disabled={isPending}
           >
-            {isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : null}
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Hapus
           </Button>
         </DialogFooter>

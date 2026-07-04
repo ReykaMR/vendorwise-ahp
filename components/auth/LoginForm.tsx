@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { LoginInput, loginSchema } from "@/lib/validations/auth.validation";
@@ -31,6 +32,7 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const registered = searchParams.get("registered") === "true";
@@ -134,11 +136,23 @@ export function LoginForm() {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-teal-500" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-9 border-teal-200 focus-visible:ring-teal-500"
+                    className="pl-9 pr-10 border-teal-200 focus-visible:ring-teal-500"
                     {...register("password")}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-500 hover:text-teal-700"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
               </FieldContent>
               {errors.password && (
@@ -154,7 +168,7 @@ export function LoginForm() {
           >
             {isPending ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Memeriksa...
               </>
             ) : (
@@ -170,6 +184,14 @@ export function LoginForm() {
             className="font-medium text-teal-600 hover:text-teal-800 underline decoration-teal-300 underline-offset-2"
           >
             Daftar Sekarang
+          </Link>
+        </p>
+        <p className="mt-2 text-center text-sm text-gray-500">
+          <Link
+            href="/forgot-password"
+            className="text-teal-600 hover:text-teal-800 underline decoration-teal-300 underline-offset-2"
+          >
+            Lupa password?
           </Link>
         </p>
       </CardContent>

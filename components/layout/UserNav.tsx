@@ -52,16 +52,16 @@ export function UserNav({ user }: UserNavProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/profile")}>
-          <User className="mr-2 h-4 w-4" />
+          <User className="h-4 w-4" />
           Profil
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push("/settings")}>
-          <Settings className="mr-2 h-4 w-4" />
+          <Settings className="h-4 w-4" />
           Pengaturan
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })}>
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="h-4 w-4" />
           Keluar
         </DropdownMenuItem>
       </DropdownMenuContent>

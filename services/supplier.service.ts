@@ -9,6 +9,13 @@ export const supplierService = {
     return supplierRepository.findById(id);
   },
 
+  async findByName(name: string) {
+    const suppliers = await supplierRepository.findMany();
+    return (
+      suppliers.find((s) => s.name.toLowerCase() === name.toLowerCase()) || null
+    );
+  },
+
   async create(data: {
     name: string;
     address?: string;
@@ -16,6 +23,11 @@ export const supplierService = {
     phone?: string;
     email?: string;
   }) {
+    const existing = await this.findByName(data.name);
+    if (existing) {
+      throw new Error("Nama pemasok sudah ada");
+    }
+
     const cleanData = {
       name: data.name,
       address: data.address || undefined,
@@ -36,6 +48,13 @@ export const supplierService = {
       email?: string;
     },
   ) {
+    if (data.name) {
+      const existing = await this.findByName(data.name);
+      if (existing && existing.id !== id) {
+        throw new Error("Nama pemasok sudah ada");
+      }
+    }
+
     const cleanData: Record<string, string> = {};
     if (data.name) cleanData.name = data.name;
     if (data.address !== undefined) cleanData.address = data.address;

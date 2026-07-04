@@ -4,7 +4,7 @@
 
 ## Gambaran Proyek
 
-VendorWise AHP adalah aplikasi web berbasis Sistem Pendukung Keputusan (SPK) yang digunakan untuk membantu proses pemilihan pemasok bahan baku menggunakan metode **Analytic Hierarchy Process (AHP)**.
+VendorWise AHP adalah aplikasi web yang digunakan untuk membantu proses pemilihan pemasok bahan baku dengan metode **Analytic Hierarchy Process (AHP)**.
 
 Aplikasi ini memungkinkan pengguna membandingkan beberapa pemasok berdasarkan sejumlah kriteria, menghitung bobot prioritas menggunakan metode AHP, lalu menghasilkan peringkat pemasok secara objektif.
 
@@ -37,7 +37,7 @@ Aplikasi ini memungkinkan pengguna membandingkan beberapa pemasok berdasarkan se
 
 **Otentikasi**
 
-- Auth.js (NextAuth) — Credentials Provider + JWT
+- Auth.js (NextAuth) - Credentials Provider + JWT
 
 **Validasi**
 
@@ -87,14 +87,14 @@ Hak akses: kelola profil sendiri, isi matriks perbandingan AHP, hitung hasil, li
 
 Proyek ini menggunakan 10 model Prisma:
 
-- `User` — Pengguna
-- `Account`, `Session`, `VerificationToken` — NextAuth PrismaAdapter
-- `Criteria` — Kriteria (self-referential hierarki)
-- `Supplier` — Pemasok
-- `CriteriaComparison` — Perbandingan berpasangan kriteria
-- `SupplierComparison` — Perbandingan berpasangan pemasok per kriteria
-- `CriteriaPriority` — Bobot prioritas kriteria hasil AHP
-- `SupplierPriority` — Bobot prioritas pemasok hasil AHP per kriteria
+- `User` - Pengguna
+- `Account`, `Session`, `VerificationToken` - NextAuth PrismaAdapter
+- `Criteria` - Kriteria (self-referential hierarki)
+- `Supplier` - Pemasok
+- `CriteriaComparison` - Perbandingan berpasangan kriteria
+- `SupplierComparison` - Perbandingan berpasangan pemasok per kriteria
+- `CriteriaPriority` - Bobot prioritas kriteria hasil AHP
+- `SupplierPriority` - Bobot prioritas pemasok hasil AHP per kriteria
 
 `schema.prisma` adalah sumber kebenaran tunggal untuk struktur basis data.
 
@@ -190,14 +190,14 @@ Logika bisnis **hanya** di Service Layer. Akses DB **hanya** di Repository Layer
 
 # Referensi
 
-- **Metode**: Analytic Hierarchy Process (AHP) — Saaty
+- **Metode**: Analytic Hierarchy Process (AHP) - Saaty
 - **Arsitektur**: Layered Architecture (UI → Action → Service → Repository → Prisma)
 - **Framework**: Next.js App Router
 - **ORM**: Prisma
 
 Dokumen terkait:
 
-- **AGENTS.md** — Aturan implementasi dan coding convention
-- **FEATURES.md** — Spesifikasi fitur lengkap dengan status
-- **TASK.md** — Tugas pengembangan per sprint
-- **AUDIT.md** — Hasil audit implementasi fitur
+- **AGENTS.md** - Aturan implementasi dan coding convention
+- **FEATURES.md** - Spesifikasi fitur lengkap dengan status
+- **TASK.md** - Tugas pengembangan per sprint
+- **AUDIT.md** - Hasil audit implementasi fitur

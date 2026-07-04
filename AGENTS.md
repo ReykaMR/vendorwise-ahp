@@ -23,7 +23,7 @@ VendorWise AHP
 
 **Deskripsi**
 
-Sistem Pendukung Keputusan (SPK) berbasis web untuk pemilihan pemasok bahan baku menggunakan metode Analytic Hierarchy Process (AHP).
+Sistem pemilihan pemasok bahan baku dengan metode Analytic Hierarchy Process (AHP).
 
 ---
 
@@ -34,7 +34,7 @@ Sistem Pendukung Keputusan (SPK) berbasis web untuk pemilihan pemasok bahan baku
 - Tailwind CSS 4
 - shadcn/ui + Radix UI
 - Prisma 7 ORM + PostgreSQL 18
-- Auth.js (NextAuth) — Credentials + JWT
+- Auth.js (NextAuth) - Credentials + JWT
 - Zod + React Hook Form + @hookform/resolvers
 - bcryptjs
 - Recharts
@@ -87,16 +87,16 @@ Jangan pernah mengakses Prisma langsung dari halaman atau komponen UI.
 
 Gunakan struktur folder berikut secara konsisten:
 
-- `app/` — Halaman (App Router), Route Handlers, Server Actions
-- `components/` — Komponen React UI
-- `lib/` — Utilitas, validasi Zod, engine AHP, helper export
-- `services/` — Lapisan logika bisnis
-- `repositories/` — Lapisan akses data (Prisma)
-- `types/` — Tipe TypeScript global (next-auth.d.ts)
+- `app/` - Halaman (App Router), Route Handlers, Server Actions
+- `components/` - Komponen React UI
+- `lib/` - Utilitas, validasi Zod, engine AHP, helper export
+- `services/` - Lapisan logika bisnis
+- `repositories/` - Lapisan akses data (Prisma)
+- `types/` - Tipe TypeScript global (next-auth.d.ts)
 
 Jangan membuat folder tingkat atas baru kecuali benar-benar diperlukan.
 
-Folder `features/`, `hooks/`, `utils/` tidak digunakan — simpan logika di folder di atas.
+Folder `features/`, `hooks/`, `utils/` tidak digunakan - simpan logika di folder di atas.
 
 ---
 

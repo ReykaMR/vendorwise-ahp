@@ -20,7 +20,7 @@ const saatyScaleValues = [
   9,
 ] as const;
 
-export const comparisonValueSchema = z
+const comparisonValueSchema = z
   .number()
   .refine((val) => saatyScaleValues.some((s) => Math.abs(s - val) < 1e-10), {
     message: "Nilai harus berupa skala Saaty (1/9 – 9)",
@@ -52,8 +52,3 @@ export const saveSupplierComparisonSchema = z
     message: "Tidak dapat membandingkan pemasok dengan dirinya sendiri",
     path: ["supplier2Id"],
   });
-
-export type SaveComparisonInput = z.infer<typeof saveComparisonSchema>;
-export type SaveSupplierComparisonInput = z.infer<
-  typeof saveSupplierComparisonSchema
->;

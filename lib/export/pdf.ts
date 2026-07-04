@@ -25,7 +25,7 @@ export function exportPDF(result: AHPResult): void {
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
   doc.text(`Tanggal: ${new Date().toLocaleDateString("id-ID")}`, 14, 30);
-  doc.text("Aplikasi: VendorWise AHP — SPK Pemilihan Pemasok", 14, 36);
+  doc.text("Aplikasi: VendorWise AHP - SPK Pemilihan Pemasok", 14, 36);
 
   let y = 44;
 

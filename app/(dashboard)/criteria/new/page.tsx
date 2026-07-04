@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default async function NewCriteriaPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login");
+  if (session.user.role !== "ADMIN") redirect("/criteria");
 
   const parents = await criteriaService.getAvailableParents();
 

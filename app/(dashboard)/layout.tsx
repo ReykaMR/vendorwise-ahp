@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppTopbar } from "@/components/layout/AppTopbar";
 import { AppFooter } from "@/components/layout/AppFooter";
+import { OnboardingGuide } from "@/components/onboarding/OnboardingGuide";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
@@ -21,6 +22,7 @@ export default async function DashboardLayout({
         <main className="min-h-[calc(100vh-8rem)] p-4 lg:p-6">{children}</main>
         <AppFooter />
       </div>
+      <OnboardingGuide />
     </div>
   );
 }

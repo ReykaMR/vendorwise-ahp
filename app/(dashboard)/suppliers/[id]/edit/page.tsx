@@ -14,6 +14,7 @@ export default async function EditSupplierPage({
 }: EditSupplierPageProps) {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login");
+  if (session.user.role !== "ADMIN") redirect("/suppliers");
 
   const { id } = await params;
   const supplier = await supplierService.getById(id);

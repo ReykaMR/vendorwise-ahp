@@ -5,7 +5,7 @@ import { RegisterForm } from "@/components/auth/RegisterForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Daftar — VendorWise AHP",
+  title: "Daftar - VendorWise AHP",
   description: "Halaman pendaftaran akun baru VendorWise AHP.",
 };
 

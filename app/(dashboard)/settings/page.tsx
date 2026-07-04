@@ -5,8 +5,8 @@ import { SettingsForm } from "./SettingsForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pengaturan — VendorWise AHP",
-  description: "Pengaturan akun VendorWise AHP.",
+  title: "Pengaturan - VendorWise AHP",
+  description: "Pengaturan aplikasi VendorWise AHP.",
 };
 
 export default async function SettingsPage() {
@@ -18,13 +18,14 @@ export default async function SettingsPage() {
       <div>
         <h1 className="text-3xl font-bold text-teal-800">Pengaturan</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Informasi akun Anda saat ini
+          Kelola pengaturan dan preferensi aplikasi Anda
         </p>
       </div>
       <SettingsForm
         user={{
           name: session.user.name || "",
           email: session.user.email || "",
+          role: session.user.role,
         }}
       />
     </div>

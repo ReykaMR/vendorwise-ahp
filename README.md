@@ -1,14 +1,22 @@
 # VendorWise AHP
 
-<strong>Sistem Pendukung Keputusan Pemilihan Pemasok Bahan Baku</strong>
-<br />
-Berbasis metode <em>Analytic Hierarchy Process</em> (AHP) — Saaty
+<strong>Sistem Pemilihan Pemasok Bahan Baku dengan metode <em>Analytic Hierarchy Process</em> (AHP) - Saaty</strong>
 
+<p>
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16.2.4-black" />
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-blue" />
-  <img alt="Prisma" src="https://img.shields.io/badge/Prisma-7-2D3748" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-blue" />
+  <img alt="React" src="https://img.shields.io/badge/React-19.2-087EA4" />
+  <img alt="Prisma" src="https://img.shields.io/badge/Prisma-7.7-2D3748" />
   <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-18-336791" />
   <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4-38BDF8" />
+</p>
+
+<table style="border: none; border-collapse: collapse;">
+  <tr>
+    <td style="border: none;"><img alt="Halaman Home" src="" /></td>
+    <td style="border: none;"><img alt="Halaman Perbandingan" src="" /></td>
+  </tr>
+</table>
 
 ## Daftar Isi
 
@@ -17,6 +25,8 @@ Berbasis metode <em>Analytic Hierarchy Process</em> (AHP) — Saaty
 - [Tumpukan Teknologi](#tumpukan-teknologi)
 - [Prasyarat](#prasyarat)
 - [Panduan Instalasi](#panduan-instalasi)
+- [Variabel Lingkungan](#variabel-lingkungan)
+- [Panduan Deploy](#panduan-deploy)
 - [Arsitektur](#arsitektur)
 - [Alur AHP](#alur-ahp)
 - [Peran Pengguna](#peran-pengguna)
@@ -26,7 +36,7 @@ Berbasis metode <em>Analytic Hierarchy Process</em> (AHP) — Saaty
 
 ## Tentang
 
-**VendorWise AHP** adalah aplikasi web berbasis Sistem Pendukung Keputusan (SPK) yang membantu proses pemilihan pemasok bahan baku menggunakan metode **Analytic Hierarchy Process (AHP)**.
+**VendorWise AHP** adalah aplikasi web yang membantu proses pemilihan pemasok bahan baku menggunakan metode **Analytic Hierarchy Process (AHP)**.
 
 Aplikasi ini memungkinkan pengguna untuk:
 
@@ -45,6 +55,8 @@ Aplikasi ini memungkinkan pengguna untuk:
 | -------------------------- | ------------------------------------------------- |
 | Registrasi Akun            | Pendaftaran pengguna baru (nama, email, password) |
 | Login / Logout             | Autentikasi menggunakan email dan password (JWT)  |
+| Lupa Password              | Kirim link reset password via email               |
+| Reset Password             | Atur ulang password melalui token                 |
 | Manajemen Profil           | Ubah nama, email, atau password                   |
 | Manajemen Pengguna (Admin) | CRUD pengguna, reset password, ubah peran         |
 
@@ -55,25 +67,31 @@ Aplikasi ini memungkinkan pengguna untuk:
 | Kriteria (hierarki CRUD)   | Input nama, deskripsi, level hierarki (0 = utama, 1+ = subkriteria) |
 | Visualisasi Pohon Kriteria | Tampilan parent-child bertingkat                                    |
 | Pemasok (CRUD)             | Input nama, alamat, kontak, telepon, email                          |
-| Tabel Pemasok              | Tabel dengan pencarian dan filter                                   |
+| Tabel Pemasok              | Pencarian, filter, dan pagination                                   |
+| Deteksi Duplikat Inline    | Peringatan nama pemasok/kriteria sudah terdaftar saat mengetik      |
 
 ### Perbandingan Berpasangan (AHP Input)
 
-| Fitur                         | Deskripsi                                                   |
-| ----------------------------- | ----------------------------------------------------------- |
-| Matriks Perbandingan Kriteria | Form interaktif skala Saaty 1–9, hanya sisi atas (simetris) |
-| Nilai Kebalikan Otomatis      | Nilai reciprocal 1/x tampil otomatis di sel simetris        |
-| Simpan Draft Otomatis         | Setiap perubahan nilai langsung disimpan (debouce 800ms)    |
-| Matriks Perbandingan Pemasok  | Per kriteria, isi perbandingan antar pemasok                |
-| Navigasi per Kriteria         | Dropdown pilih kriteria untuk mengisi matriks pemasok       |
-| Progress Bar                  | Indikator jumlah perbandingan yang sudah diisi              |
+| Fitur                         | Deskripsi                                                             |
+| ----------------------------- | --------------------------------------------------------------------- |
+| Matriks Perbandingan Kriteria | Form interaktif skala Saaty 1–9, hanya sisi atas (simetris)           |
+| Nilai Kebalikan Otomatis      | Nilai reciprocal 1/x tampil otomatis di sel simetris                  |
+| Simpan Draft Otomatis         | Setiap perubahan nilai langsung disimpan (debounce 800ms)             |
+| Indikator Tersimpan           | Animasi "Menyimpan…" / "Tersimpan" setelah tiap perubahan             |
+| Sorot Sel Terbaik/Terburuk    | Sel bernilai tertinggi (hijau) dan terendah (merah) langsung terlihat |
+| Navigasi Keyboard             | Pindah antar sel dengan <kbd>Tab</kbd>                                |
+| Matriks Perbandingan Pemasok  | Per kriteria, isi perbandingan antar pemasok                          |
+| Navigasi per Kriteria         | Dropdown pilih kriteria untuk mengisi matriks pemasok                 |
+| Progress Bar                  | Indikator jumlah perbandingan yang sudah diisi                        |
 
 ### Perhitungan AHP & Analisis Konsistensi
 
 | Fitur                    | Deskripsi                                       |
 | ------------------------ | ----------------------------------------------- |
 | Bobot Prioritas Kriteria | Eigenvector dari matriks perbandingan           |
-| Consistency Ratio (CR)   | λmax, CI, CR — dengan tabel RI Saaty n=1..15    |
+| Consistency Ratio (CR)   | λmax, CI, CR - dengan tabel RI Saaty n=1..15    |
+| Badge Konsistensi Inline | CR langsung terlihat tiap kali sel diubah       |
+| Peringatan Inkonsistensi | Alert jika CR > 0.1, saran revisi               |
 | Bobot Prioritas Pemasok  | Eigenvector untuk setiap kriteria               |
 | Skor Akhir Pemasok       | Weighted sum: Σ(bobot kriteria × bobot pemasok) |
 | Peringkat Pemasok        | Urut dari skor tertinggi ke terendah            |
@@ -88,7 +106,23 @@ Aplikasi ini memungkinkan pengguna untuk:
 | Peringatan Konsistensi          | Alert hijau/kuning jika CR > 0.1                                |
 | Ekspor PDF                      | Laporan multi-page (bobot kriteria → bobot pemasok → peringkat) |
 | Ekspor Excel                    | 3 sheet: Bobot Kriteria, Bobot Pemasok, Peringkat Akhir         |
-| Riwayat Perhitungan             | Snapshot JSON otomatis setiap kali hitung AHP                   |
+| Riwayat Perhitungan             | Snapshot JSON otomatis tiap kali hitung AHP                     |
+| Edit Label Riwayat              | Ubah nama riwayat langsung dari daftar                          |
+| Hapus Massal Riwayat            | Pilih beberapa riwayat sekaligus untuk dihapus                  |
+
+### Pengalaman Pengguna
+
+| Fitur                    | Deskripsi                                                  |
+| ------------------------ | ---------------------------------------------------------- |
+| Panduan Onboarding       | Tur interaktif 4 langkah saat pertama kali masuk           |
+| Breadcrumb               | Navigasi posisi halaman saat ini                           |
+| Skeleton Loading         | Placeholder animasi selama konten dimuat                   |
+| Empty State              | Tampilan khusus saat belum ada data                        |
+| Pencarian & Filter       | Cari riwayat, kriteria, pemasok secara real-time           |
+| Pagination               | Pembagian daftar panjang (15 item per halaman)             |
+| Toggle Password          | Tombol lihat/sembunyikan password di form login & register |
+| Konfirmasi Sebelum Hapus | Dialog konfirmasi untuk setiap aksi penghapusan            |
+| Fallback Font            | Font cadangan jika font utama gagal dimuat                 |
 
 ### REST API
 
@@ -111,17 +145,17 @@ Aplikasi ini memungkinkan pengguna untuk:
 | Teknologi            | Versi  | Keterangan            |
 | -------------------- | ------ | --------------------- |
 | Next.js              | 16.2.4 | App Router, Turbopack |
-| TypeScript           | 5      | Strict mode           |
+| TypeScript           | 5.9    | Strict mode           |
 | Tailwind CSS         | 4      | Utility-first CSS     |
 | shadcn/ui + Radix UI | -      | Komponen UI           |
-| React                | 19.2.4 | -                     |
+| React                | 19.2   | -                     |
 
 ### Basis Data
 
 | Teknologi  | Versi | Keterangan                    |
 | ---------- | ----- | ----------------------------- |
 | PostgreSQL | 18    | Database relasional           |
-| Prisma     | 7.7.0 | ORM (query builder + migrasi) |
+| Prisma     | 7.7   | ORM (query builder + migrasi) |
 
 ### Otentikasi
 
@@ -134,7 +168,7 @@ Aplikasi ini memungkinkan pengguna untuk:
 
 | Teknologi           | Keterangan               |
 | ------------------- | ------------------------ |
-| Zod                 | Validasi skema di server |
+| Zod 4               | Validasi skema di server |
 | React Hook Form     | Form client-side         |
 | @hookform/resolvers | Integrasi Zod + RHF      |
 
@@ -152,9 +186,9 @@ bcryptjs, Lucide React, Sonner (toast), class-variance-authority, clsx, tailwind
 
 ## Prasyarat
 
-- **Node.js** ≥ 20.x
-- **PostgreSQL** ≥ 16
-- **npm**
+- **Node.js** 24.x.x
+- **PostgreSQL** 18
+- **npm** 11.x.x
 
 ## Panduan Instalasi
 
@@ -208,6 +242,50 @@ npm run dev
 
 Buka [http://localhost:3000](http://localhost:3000).
 
+## Variabel Lingkungan
+
+| Variabel                  | Wajib | Default                 | Deskripsi                               |
+| ------------------------- | ----- | ----------------------- | --------------------------------------- |
+| `DATABASE_URL`            | ✅    | -                       | Koneksi PostgreSQL (format URL)         |
+| `NEXTAUTH_SECRET`         | ✅    | -                       | Rahasia enkripsi JWT (min. 32 karakter) |
+| `NEXTAUTH_URL`            | ✅    | `http://localhost:3000` | URL absolut aplikasi                    |
+| `SMTP_HOST`               |       | -                       | Host SMTP untuk email (lupa password)   |
+| `SMTP_PORT`               |       | 587                     | Port SMTP                               |
+| `SMTP_USER`               |       | -                       | User SMTP                               |
+| `SMTP_PASSWORD`           |       | -                       | Password SMTP                           |
+| `SMTP_FROM`               |       | -                       | Alamat pengirim email                   |
+| `NEXT_PUBLIC_APP_VERSION` |       | `0.0.0`                 | Versi aplikasi (opsional)               |
+
+> Semua variabel SMTP hanya diperlukan jika fitur _reset password via email_ diaktifkan. Tanpa SMTP, link reset akan ditampilkan langsung di halaman (mode development).
+
+## Panduan Deploy
+
+### Deploy ke Vercel (recommended)
+
+1. Push repositori ke GitHub
+2. Import project di [vercel.com](https://vercel.com)
+3. Set environment variables di dashboard Vercel
+4. Deploy
+
+### Deploy ke VPS (manual)
+
+```bash
+# Build production
+npm run build
+
+# Jalankan dengan PM2 (recommended)
+npm install -g pm2
+pm2 start npm --name "vendorwise-ahp" -- start
+pm2 save
+pm2 startup
+```
+
+Pastikan:
+
+- PostgreSQL dapat diakses dari server
+- Environment variables sudah diatur
+- Reverse proxy (Nginx/Caddy) mengarah ke port 3000
+
 ## Arsitektur
 
 Aplikasi menggunakan **Layered Architecture** dengan pemisahan tanggung jawab yang ketat:
@@ -215,20 +293,20 @@ Aplikasi menggunakan **Layered Architecture** dengan pemisahan tanggung jawab ya
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  UI Layer (Components)                                      │
-│  ├── Server Components     — fetching data, rendering       │
-│  └── Client Components    — interaktivitas, form, chart     │
+│  ├── Server Components     - fetching data, rendering       │
+│  └── Client Components    - interaktivitas, form, chart     │
 ├─────────────────────────────────────────────────────────────┤
 │  Action Layer (Server Actions / Route Handlers)             │
-│  ├── Server Actions        — mutate data dari form          │
-│  └── API Routes           — REST endpoint untuk integrasi   │
+│  ├── Server Actions        - mutate data dari form          │
+│  └── API Routes           - REST endpoint untuk integrasi   │
 ├─────────────────────────────────────────────────────────────┤
 │  Service Layer (Business Logic)                             │
-│  ├── AHP Engine            — eigenvector, CR, final score   │
-│  ├── Comparison Service    — matrix logic                   │
-│  └── Domain Services       — criteria, supplier, user       │
+│  ├── AHP Engine            - eigenvector, CR, final score   │
+│  ├── Comparison Service    - matrix logic                   │
+│  └── Domain Services       - criteria, supplier, user       │
 ├─────────────────────────────────────────────────────────────┤
 │  Repository Layer (Data Access)                             │
-│  └── Prisma queries        — akses database                 │
+│  └── Prisma queries        - akses database                 │
 ├─────────────────────────────────────────────────────────────┤
 │  Prisma ORM → PostgreSQL                                    │
 └─────────────────────────────────────────────────────────────┘
@@ -249,17 +327,17 @@ Analytic Hierarchy Process (AHP) oleh Thomas L. Saaty.
 
 ### Langkah-langkah
 
-1. **Definisi masalah** — tentukan kriteria dan alternatif (pemasok)
-2. **Perbandingan berpasangan** — bangun matriks pairwise untuk kriteria dan pemasok (skala 1–9)
-3. **Normalisasi matriks** — bagi setiap elemen dengan jumlah kolomnya
-4. **Vektor eigen** — rata-rata baris dari matriks ternormalisasi
-5. **λmaks** — rata-rata dari (Awᵢ / wᵢ)
-6. **CI** — (λmaks − n) / (n − 1)
-7. **CR** — CI / RI (RI dari tabel Saaty n=1..15)
-8. **Validasi** — jika CR > 0.10, peringatkan inkonsistensi
-9. **Bobot prioritas** — vektor eigen (dinormalisasi)
-10. **Skor akhir** — Σ(bobot_kriteria × bobot_pemasok) untuk setiap pemasok
-11. **Peringkat** — urutkan pemasok berdasarkan skor akhir (descending)
+1. **Definisi masalah** - tentukan kriteria dan alternatif (pemasok)
+2. **Perbandingan berpasangan** - bangun matriks pairwise untuk kriteria dan pemasok (skala 1–9)
+3. **Normalisasi matriks** - bagi setiap elemen dengan jumlah kolomnya
+4. **Vektor eigen** - rata-rata baris dari matriks ternormalisasi
+5. **λmaks** - rata-rata dari (Awᵢ / wᵢ)
+6. **CI** - (λmaks − n) / (n − 1)
+7. **CR** - CI / RI (RI dari tabel Saaty n=1..15)
+8. **Validasi** - jika CR > 0.10, peringatkan inkonsistensi
+9. **Bobot prioritas** - vektor eigen (dinormalisasi)
+10. **Skor akhir** - Σ(bobot_kriteria × bobot_pemasok) untuk setiap pemasok
+11. **Peringkat** - urutkan pemasok berdasarkan skor akhir (descending)
 
 ### Rute Aplikasi
 
@@ -296,7 +374,7 @@ Login → Dashboard → Kelola Kriteria → Kelola Pemasok
 
 ## API Documentation
 
-Semua endpoint REST API memerlukan autentikasi (session cookie). Gunakan `AuthenticationError` untuk mengecek kegagalan auth.
+Semua endpoint REST API memerlukan autentikasi (session cookie via Auth.js).
 
 ### Response Format
 

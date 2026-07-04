@@ -50,9 +50,7 @@ export const priorityRepository = {
 
   // ---- Supplier Priority ----
 
-  async findSupplierByUser(
-    userId: string,
-  ): Promise<
+  async findSupplierByUser(userId: string): Promise<
     (SupplierPriority & {
       criteria: { name: string };
       supplier: { name: string };

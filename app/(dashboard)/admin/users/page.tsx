@@ -21,7 +21,7 @@ export default async function AdminUsersPage() {
         <h1 className="text-3xl font-bold text-teal-800">Manajemen Pengguna</h1>
         <Link href="/admin/users/new">
           <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Plus className="mr-2 h-4 w-4" /> Tambah Pengguna
+            <Plus className="h-4 w-4" /> Tambah Pengguna
           </Button>
         </Link>
       </div>

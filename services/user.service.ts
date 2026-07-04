@@ -83,6 +83,12 @@ export const userService = {
     return true;
   },
 
+  async updatePassword(email: string, hashedPassword: string) {
+    const user = await userRepository.findByEmail(email.toLowerCase());
+    if (!user) throw new Error("User not found");
+    return userRepository.update(user.id, { password: hashedPassword });
+  },
+
   async isEmailTaken(email: string, excludeId?: string) {
     const user = await userRepository.findByEmail(email.toLowerCase());
     if (!user) return false;

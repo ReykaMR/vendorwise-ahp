@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useActionState, useEffect, useState } from "react";
+import { useUnsavedChanges } from "@/lib/hooks/useUnsavedChanges";
 import {
   ChangePasswordInput,
   changePasswordSchema,
@@ -25,7 +26,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 export function ChangePasswordForm() {
   const [state, formAction, isPending] = useActionState(changePassword, null);
@@ -36,7 +38,7 @@ export function ChangePasswordForm() {
   const {
     register,
     setError,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm<ChangePasswordInput>({
     resolver: zodResolver(changePasswordSchema),
@@ -46,6 +48,8 @@ export function ChangePasswordForm() {
       confirmNewPassword: "",
     },
   });
+
+  useUnsavedChanges(isDirty);
 
   useEffect(() => {
     if (state?.errors) {
@@ -62,6 +66,7 @@ export function ChangePasswordForm() {
 
   useEffect(() => {
     if (state?.success) {
+      toast.success("Password berhasil diubah");
       reset();
     }
   }, [state?.success, reset]);
@@ -77,15 +82,6 @@ export function ChangePasswordForm() {
 
       <CardContent>
         <form action={formAction} className="space-y-4">
-          {state?.success && (
-            <Alert className="bg-green-50 border-green-200">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
-                Password berhasil diubah.
-              </AlertDescription>
-            </Alert>
-          )}
-
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="currentPassword" className="text-teal-800">
@@ -205,7 +201,7 @@ export function ChangePasswordForm() {
           >
             {isPending ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Mengganti...
               </>
             ) : (

@@ -6,7 +6,7 @@ import { HistoryClient } from "./HistoryClient";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Riwayat Perhitungan — VendorWise AHP",
+  title: "Riwayat Perhitungan - VendorWise AHP",
   description: "Riwayat semua perhitungan AHP yang pernah dilakukan.",
 };
 

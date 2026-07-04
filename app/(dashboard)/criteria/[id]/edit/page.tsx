@@ -14,6 +14,7 @@ export default async function EditCriteriaPage({
 }: EditCriteriaPageProps) {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login");
+  if (session.user.role !== "ADMIN") redirect("/criteria");
 
   const { id } = await params;
   const criteria = await criteriaService.getById(id);

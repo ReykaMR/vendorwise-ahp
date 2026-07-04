@@ -18,16 +18,13 @@ const RI: number[] = [
   1.59, // n=15
 ];
 
-export function getRI(n: number): number {
+function getRI(n: number): number {
   if (n <= 0) return 0;
   if (n > RI.length) return RI[RI.length - 1];
   return RI[n - 1];
 }
 
-export function calculateLambdaMax(
-  matrix: number[][],
-  eigenvector: number[],
-): number {
+function calculateLambdaMax(matrix: number[][], eigenvector: number[]): number {
   const n = matrix.length;
   if (n === 0) return 0;
 
@@ -43,12 +40,12 @@ export function calculateLambdaMax(
   return lambdaSum / n;
 }
 
-export function calculateCI(lambdaMax: number, n: number): number {
+function calculateCI(lambdaMax: number, n: number): number {
   if (n <= 1) return 0;
   return (lambdaMax - n) / (n - 1);
 }
 
-export function calculateCR(ci: number, n: number): number {
+function calculateCR(ci: number, n: number): number {
   const ri = getRI(n);
   if (ri === 0) return 0;
   return ci / ri;
