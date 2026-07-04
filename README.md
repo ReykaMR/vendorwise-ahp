@@ -13,8 +13,8 @@
 
 <table style="border: none; border-collapse: collapse;">
   <tr>
-    <td style="border: none;"><img alt="Halaman Home" src="" /></td>
-    <td style="border: none;"><img alt="Halaman Perbandingan" src="" /></td>
+    <td style="border: none;"><img width="1024" height="823" alt="Halaman Home" src="https://github.com/user-attachments/assets/6871e1f2-08e1-4f13-b46d-960859c2eefc" /></td>
+    <td style="border: none;"><img width="1024" height="823" alt="Halaman Perbandingan" src="https://github.com/user-attachments/assets/f73245ea-430b-4029-a6b8-8e5d3d1a9867" /></td>
   </tr>
 </table>
 
